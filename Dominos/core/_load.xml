@@ -1,0 +1,8 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Dominos.lua" />
+	<Script file="fadeManager.lua" />
+	<Script file="drag.lua" />
+	<Script file="frame.lua" />
+	<Script file="bindableButton.lua" />
+	<Script file="minimap.lua" />
+</Ui>
