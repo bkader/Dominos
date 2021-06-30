@@ -1,6 +1,6 @@
 assert(Dominos, "Dominos not found!")
 local Dominos = Dominos
-local L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config", true)
+local L
 
 -- used to kill old function
 local function noFunc() return end
@@ -13,42 +13,68 @@ local function killFrame(frame)
 	end
 end
 
-local minimapBar = CreateFrame("Frame", "MinimapBar", MinimapClusterBar)
+local minimapBar = CreateFrame("Frame", "MinimapBar", _G.MinimapClusterBar)
 MinimapBorderTop:SetParent(MainMenuBarArtFrame)
 MinimapBackdrop:SetParent(MainMenuBarArtFrame)
 Minimap:SetParent(minimapBar)
-Minimap:SetMaskTexture("Interface\\AddOns\\Dominos\\textures\\minimap.blp")
 
 local select = select
 
-local menuButtons
+local menuButtons = {}
 do
     local loadButtons = function(...)
-    	menuButtons = {}
         for i = 1, select("#", ...) do
             local btn = select(i, ...)
             tinsert(menuButtons, btn)
         end
     end
     loadButtons(minimapBar:GetChildren())
-
-    -- move buttons where they should be
-    MiniMapInstanceDifficulty:ClearAllPoints()
-    MiniMapInstanceDifficulty:SetPoint("TOPLEFT", Minimap)
-    MiniMapInstanceDifficulty:SetFrameStrata("LOW")
-    killFrame(MiniMapInstanceDifficulty)
 end
 
 local mod = Dominos:NewModule("minimap")
 local class = Dominos:CreateClass("Frame", Dominos.Frame)
 
 function mod:Load()
+	if not Dominos:UseMinimap() then
+		if self.frame then self:Unload() end
+		MinimapBorderTop:SetParent(MinimapCluster)
+		MinimapBackdrop:SetParent(MinimapCluster)
+		Minimap:SetParent(MinimapCluster)
+		return
+	end
+	Minimap:SetBackdrop({
+		bgFile = [[Interface\AddOns\Dominos\textures\minimap.blp]],
+		insets = {top = -3, bottom = -2, left = -3, right = -2}
+	})
+	Minimap:SetBackdropColor(0, 0, 0, 1)
+
     self.frame = class:New()
     self.frame:SetFrameStrata("LOW")
+
+    MiniMapInstanceDifficulty:ClearAllPoints()
+    MiniMapInstanceDifficulty:SetPoint("TOPLEFT", Minimap)
+    MiniMapInstanceDifficulty:SetFrameStrata("LOW")
+    killFrame(MiniMapInstanceDifficulty)
+    MiniMapInstanceDifficulty:SetScale(self.frame:GetScale() * 0.75)
+
+    MiniMapLFGFrame:SetParent(minimapBar)
+    MiniMapLFGFrame:ClearAllPoints()
+    MiniMapLFGFrame:SetPoint("BOTTOMLEFT", Minimap)
+    killFrame(MiniMapLFGFrame)
+    MiniMapLFGFrame:SetScale(self.frame:GetScale() * 0.75)
+
+    Dominos.RegisterCallback(self, "DOMINOS_RESCALE")
+end
+
+function mod:DOMINOS_RESCALE()
+    MiniMapInstanceDifficulty:SetScale(self.frame:GetScale() * 0.75)
+    MiniMapLFGFrame:SetScale(self.frame:GetScale() * 0.75)
 end
 
 function mod:Unload()
-    self.frame:Free()
+    if self.frame then
+		self.frame:Free()
+    end
 end
 
 function class:New()

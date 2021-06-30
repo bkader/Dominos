@@ -1,22 +1,34 @@
 assert(Dominos, "Dominos not found!")
 local Dominos = Dominos
 
-BuffFrame:Hide()
-
-local BuffModule = Dominos:NewModule("Buffs")
-local BuffFrame = Dominos:CreateClass("Frame", Dominos.Frame)
-local LBF = LibStub("LibButtonFacade", true)
+local BuffsModule = Dominos:NewModule("Buffs")
+local BuffsFrame = Dominos:CreateClass("Frame", Dominos.Frame)
 local L
+local LBF = LibStub("LibButtonFacade", true)
 
-function BuffModule:Load()
-    self.frame = BuffFrame:New()
+function BuffsModule:Load()
+	if not Dominos:UseAuras() then
+		self:Unload()
+		return
+	end
+
+	BuffFrame:Hide()
+    self.frame = BuffsFrame:New()
 end
 
-function BuffModule:Unload()
-    self.frame:Free()
+function BuffsModule:Unload()
+	if self.frame then
+		self.frame:Free()
+	end
 end
 
-function BuffFrame:New()
+function BuffsFrame:SkinButton(btn)
+	if LBF then
+		LBF:Group("Dominos", "Buffs"):AddButton(btn)
+	end
+end
+
+function BuffsFrame:New()
     local f = self.super.New(self, "buffs")
     if not self.buffs then
         f:CreateBuffs()
@@ -28,22 +40,23 @@ function BuffFrame:New()
     return f
 end
 
-function BuffFrame:GetDefaults()
-    return {scale = 1, point = "CENTER", numButtons = 32, y = 0, x = 0}
+function BuffsFrame:GetDefaults()
+    return {scale = 1, point = "CENTER", numButtons = 36, y = 0, x = 0}
 end
 
-function BuffFrame:NumButtons()
-    return self.sets.numButtons or 32
+function BuffsFrame:NumButtons()
+    return self.sets.numButtons or 36
 end
 
-function BuffFrame:AddButton(i)
+function BuffsFrame:AddButton(i)
 	local b = self.buffs[i]
 	if not b then return end
 	b:SetParent(self.header)
+	self:SkinButton(b)
 	self.buttons[i] = b
 end
 
-function BuffFrame:RemoveButton(i)
+function BuffsFrame:RemoveButton(i)
     local b = self.buttons[i]
     if not b then return end
     b:SetParent(nil)
@@ -51,17 +64,15 @@ function BuffFrame:RemoveButton(i)
     self.buttons[i] = nil
 end
 
-function BuffFrame:CreateBuffs()
+function BuffsFrame:CreateBuffs()
     self.buffs = self.buffs or {}
-    for i = 1, 32 do
+    for i = 1, 36 do
         self.buffs[i] = self.buffs[i] or self:CreateBuff(i)
     end
 end
 
-function BuffFrame:CreateBuff(id)
-    local frame, frameName
-    local selfName = "DominosBuff"
-    local frameName = selfName .. id
+function BuffsFrame:CreateBuff(id)
+    local frameName = "DominosBuff" .. id
     local buff = CreateFrame("Button", frameName, UIParent, "BuffButtonTemplate, TargetBuffFrameTemplate")
     buff:SetSize(34, 34)
     buff.icon = _G[frameName .. "Icon"]
@@ -74,10 +85,10 @@ function BuffFrame:CreateBuff(id)
     return buff
 end
 
-function BuffFrame:UpdateBuff(id, elapsed)
+function BuffsFrame:UpdateBuff(id, elapsed)
 	local buff = self.buffs[id]
 	if not buff then return end
-	BuffFrame:AuraButtonUpdate(buff:GetName(), id, "HELPFUL")
+	BuffsFrame:AuraButtonUpdate(buff:GetName(), id, "HELPFUL")
 	buff.id = id
 end
 
@@ -85,7 +96,7 @@ local function AddSizeSlider(p)
     L = L or LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
     local size = p:NewSlider(L.Size, 1, 1, 1)
     size.OnShow = function(self)
-        self:SetMinMaxValues(1, 32)
+        self:SetMinMaxValues(1, 36)
         self:SetValue(self:GetParent().owner:NumButtons())
     end
     size.UpdateValue = function(self, value)
@@ -110,14 +121,14 @@ local function AddAdvancedLayout(self)
     self:AddAdvancedPanel()
 end
 
-function BuffFrame:CreateMenu()
+function BuffsFrame:CreateMenu()
     local menu = Dominos:NewMenu(self.id)
     AddLayoutPanel(menu)
     AddAdvancedLayout(menu)
     self.menu = menu
 end
 
-function BuffFrame:AuraButtonUpdate(buttonName, index, filter)
+function BuffsFrame:AuraButtonUpdate(buttonName, index, filter)
 	if ConsolidatedBuffs:IsShown() then
 		ConsolidatedBuffs:Hide()
 	end

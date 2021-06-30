@@ -1,7 +1,7 @@
 assert(Dominos, "Dominos not found!")
 local Dominos = Dominos
 
-local _G = getfenv(0)
+local _G = _G
 local format = string.format
 
 local KeyBound = LibStub('LibKeyBound-1.0')

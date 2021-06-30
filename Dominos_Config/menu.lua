@@ -1,59 +1,56 @@
---[[
-	Menu.lua
---]]
-
+--[[ Menu.lua ]] --
 --[[
 	Copyright (c) 2008-2009 Jason Greer
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		* Redistributions of source code must retain the above copyright notice, 
+		* Redistributions of source code must retain the above copyright notice,
 		  this list of conditions and the following disclaimer.
 		* Redistributions in binary form must reproduce the above copyright
-		  notice, this list of conditions and the following disclaimer in the 
+		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the author nor the names of its contributors may 
-		  be used to endorse or promote products derived from this software 
+		* Neither the name of the author nor the names of its contributors may
+		  be used to endorse or promote products derived from this software
 		  without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-	LIABLE FORANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+	LIABLE FORANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 --]]
+local Dominos = Dominos
 
-local Menu = Dominos:CreateClass('Frame')
+local Menu = Dominos:CreateClass("Frame")
 Dominos.Menu = Menu
 
-local L = LibStub('AceLocale-3.0'):GetLocale('Dominos-Config')
-local _G = getfenv()
+local L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
+local _G = _G
 local max = math.max
 local min = math.min
 
-
 Menu.bg = {
-	bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
-	edgeFile = 'Interface\\DialogFrame\\UI-DialogBox-Border',
+	bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
 	insets = {left = 11, right = 11, top = 12, bottom = 11},
 	tile = true,
 	tileSize = 32,
-	edgeSize = 32,
+	edgeSize = 32
 }
 
 Menu.extraWidth = 20
 Menu.extraHeight = 40
 
 function Menu:New(name)
-	local f = self:Bind(CreateFrame('Frame', 'DominosFrameMenu' .. name, UIParent))
+	local f = self:Bind(CreateFrame("Frame", "DominosFrameMenu" .. name, UIParent))
 	f.panels = {}
 
 	f:SetBackdrop(self.bg)
@@ -61,31 +58,31 @@ function Menu:New(name)
 	f:SetToplevel(true)
 	f:SetMovable(true)
 	f:SetClampedToScreen(true)
-	f:SetFrameStrata('DIALOG')
-	f:SetScript('OnMouseDown', self.StartMoving)
-	f:SetScript('OnMouseUp', self.StopMovingOrSizing)
+	f:SetFrameStrata("DIALOG")
+	f:SetScript("OnMouseDown", self.StartMoving)
+	f:SetScript("OnMouseUp", self.StopMovingOrSizing)
 
 	--title text
-	f.text = f:CreateFontString(nil, 'OVERLAY', 'GameFontHighlight')
-	f.text:SetPoint('TOP', 0, -15)
+	f.text = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	f.text:SetPoint("TOP", 0, -15)
 
 	--close button
-	f.close = CreateFrame('Button', nil, f, 'UIPanelCloseButton')
-	f.close:SetPoint('TOPRIGHT', -5, -5)
+	f.close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+	f.close:SetPoint("TOPRIGHT", -5, -5)
 
 	return f
 end
 
 --tells the panel what frame we're pointed to
 function Menu:SetOwner(owner)
-	for _,f in pairs(self.panels) do
+	for _, f in pairs(self.panels) do
 		f.owner = owner
 	end
 
 	if tonumber(owner.id) then
 		self.text:SetFormattedText(L.ActionBarSettings, owner.id)
 	else
-		self.text:SetFormattedText(L.BarSettings, tostring(owner.id):gsub('^%l', string.upper))
+		self.text:SetFormattedText(L.BarSettings, tostring(owner.id):gsub("^%l", string.upper))
 	end
 
 	self:Anchor(owner)
@@ -97,7 +94,7 @@ function Menu:Anchor(f)
 	local y = f:GetTop() / ratio
 
 	self:ClearAllPoints()
-	self:SetPoint('TOPRIGHT', UIParent, 'BOTTOMLEFT', x, y)
+	self:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", x, y)
 end
 
 --shows a given panel
@@ -155,11 +152,10 @@ function Menu:AddAdvancedPanel()
 
 	panel:NewLeftToRightCheckbox()
 	panel:NewTopToBottomCheckbox()
-	
+
 	panel.width = 250
 	return panel
 end
-
 
 do
 	local info = {}
@@ -179,10 +175,10 @@ do
 	end
 
 	function Menu:NewPanelSelector()
-		local f = CreateFrame('Frame', self:GetName() .. 'PanelSelector', self, 'UIDropDownMenuTemplate')
-		_G[f:GetName() .. 'Text']:SetJustifyH('LEFT')
+		local f = CreateFrame("Frame", self:GetName() .. "PanelSelector", self, "UIDropDownMenuTemplate")
+		_G[f:GetName() .. "Text"]:SetJustifyH("LEFT")
 
-		f:SetScript('OnShow', Dropdown_OnShow)
+		f:SetScript("OnShow", Dropdown_OnShow)
 
 		local function Item_OnClick(item, name)
 			self:ShowPanel(name)
@@ -192,14 +188,14 @@ do
 		function f:Initialize()
 			local parent = self:GetParent()
 			local selected = parent:GetSelectedPanel()
-			for i,panel in ipairs(parent.panels) do
+			for i, panel in ipairs(parent.panels) do
 				AddItem(panel.name, i, Item_OnClick, i == selected)
 			end
 		end
 
-		f:SetPoint('TOPLEFT', 0, -36)
-		for _,panel in pairs(self.panels) do
-			panel:SetPoint('TOPLEFT', 10, -(32 + f:GetHeight() + 6))
+		f:SetPoint("TOPLEFT", 0, -36)
+		for _, panel in pairs(self.panels) do
+			panel:SetPoint("TOPLEFT", 10, -(32 + f:GetHeight() + 6))
 		end
 
 		self.extraHeight = (self.extraHeight or 0) + f:GetHeight() + 6
@@ -208,43 +204,37 @@ do
 	end
 end
 
---[[
-	Panel Components
---]]
-
+--[[ Panel Components ]]--
 --a panel is a subframe of a menu, basically
-local Panel = Dominos:CreateClass('Frame')
+local Panel = Dominos:CreateClass("Frame")
 Menu.Panel = Panel
 
 Panel.width = 0
 Panel.height = 0
 
 function Panel:New(name, parent)
-	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. name, parent))
+	local f = self:Bind(CreateFrame("Frame", parent:GetName() .. name, parent))
 	if parent.dropdown then
-		f:SetPoint('TOPLEFT', 10, -(32 + parent.dropdown:GetHeight() + 4))
+		f:SetPoint("TOPLEFT", 10, -(32 + parent.dropdown:GetHeight() + 4))
 	else
-		f:SetPoint('TOPLEFT', 10, -32)
+		f:SetPoint("TOPLEFT", 10, -32)
 	end
-	f:SetPoint('BOTTOMRIGHT', -10, 10)
+	f:SetPoint("BOTTOMRIGHT", -10, 10)
 	f:Hide()
 
 	return f
 end
 
-
 --[[ Checkbuttons ]]--
-
---checkbutton
 function Panel:NewCheckButton(name)
-	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'InterfaceOptionsCheckButtonTemplate')
-	_G[button:GetName() .. 'Text']:SetText(name)
+	local button = CreateFrame("CheckButton", self:GetName() .. name, self, "InterfaceOptionsCheckButtonTemplate")
+	_G[button:GetName() .. "Text"]:SetText(name)
 
 	local prev = self.checkbutton
 	if prev then
-		button:SetPoint('TOP', prev, 'BOTTOM', 0, -2)
+		button:SetPoint("TOP", prev, "BOTTOM", 0, -2)
 	else
-		button:SetPoint('TOPLEFT', 2, 0)
+		button:SetPoint("TOPLEFT", 2, 0)
 	end
 	self.height = self.height + 28
 	self.checkbutton = button
@@ -252,10 +242,7 @@ function Panel:NewCheckButton(name)
 	return button
 end
 
-
 --[[ Sliders ]]--
-
---basic slider
 do
 	local function Slider_OnMouseWheel(self, arg1)
 		local step = self:GetValueStep() * arg1
@@ -263,9 +250,9 @@ do
 		local minVal, maxVal = self:GetMinMaxValues()
 
 		if step > 0 then
-			self:SetValue(min(value+step, maxVal))
+			self:SetValue(min(value + step, maxVal))
 		else
-			self:SetValue(max(value+step, minVal))
+			self:SetValue(max(value + step, minVal))
 		end
 	end
 
@@ -294,35 +281,35 @@ do
 	function Panel:NewSlider(text, low, high, step, OnShow, UpdateValue, UpdateText)
 		local name = self:GetName() .. text
 
-		local slider = CreateFrame('Slider', name, self, 'OptionsSliderTemplate')
+		local slider = CreateFrame("Slider", name, self, "OptionsSliderTemplate")
 		slider:SetMinMaxValues(low, high)
 		slider:SetValueStep(step)
 		slider:EnableMouseWheel(true)
 		BlizzardOptionsPanel_Slider_Enable(slider) --colors the slider properly
 
-		_G[name .. 'Text']:SetText(text)
-		_G[name .. 'Low']:SetText('')
-		_G[name .. 'High']:SetText('')
+		_G[name .. "Text"]:SetText(text)
+		_G[name .. "Low"]:SetText("")
+		_G[name .. "High"]:SetText("")
 
-		local text = slider:CreateFontString(nil, 'BACKGROUND')
-		text:SetFontObject('GameFontHighlightSmall')
-		text:SetPoint('LEFT', slider, 'RIGHT', 7, 0)
-		slider.valText = text
+		local t = slider:CreateFontString(nil, "BACKGROUND")
+		t:SetFontObject("GameFontHighlightSmall")
+		t:SetPoint("LEFT", slider, "RIGHT", 7, 0)
+		slider.valText = t
 
 		slider.OnShow = OnShow
 		slider.UpdateValue = UpdateValue
 		slider.UpdateText = UpdateText
 
-		slider:SetScript('OnShow', Slider_OnShow)
-		slider:SetScript('OnValueChanged', Slider_OnValueChanged)
-		slider:SetScript('OnMouseWheel', Slider_OnMouseWheel)
+		slider:SetScript("OnShow", Slider_OnShow)
+		slider:SetScript("OnValueChanged", Slider_OnValueChanged)
+		slider:SetScript("OnMouseWheel", Slider_OnMouseWheel)
 
 		local prev = self.slider
 		if prev then
-			slider:SetPoint('BOTTOM', prev, 'TOP', 0, 16)
+			slider:SetPoint("BOTTOM", prev, "TOP", 0, 16)
 			self.height = self.height + 34
 		else
-			slider:SetPoint('BOTTOMLEFT', 4, 4)
+			slider:SetPoint("BOTTOMLEFT", 4, 4)
 			self.height = self.height + 38
 		end
 		self.slider = slider
@@ -338,7 +325,7 @@ do
 	end
 
 	local function Slider_UpdateValue(self, value)
-		self:GetParent().owner:SetFrameScale(value/100)
+		self:GetParent().owner:SetFrameScale(value / 100)
 	end
 
 	function Panel:NewScaleSlider()
@@ -353,7 +340,7 @@ do
 	end
 
 	local function Slider_UpdateValue(self, value)
-		self:GetParent().owner:SetFrameAlpha(value/100)
+		self:GetParent().owner:SetFrameAlpha(value / 100)
 	end
 
 	function Panel:NewOpacitySlider()
@@ -368,7 +355,7 @@ do
 	end
 
 	local function Slider_UpdateValue(self, value)
-		self:GetParent().owner:SetFadeMultiplier(value/100)
+		self:GetParent().owner:SetFadeMultiplier(value / 100)
 	end
 
 	function Panel:NewFadeSlider()
@@ -433,25 +420,14 @@ end
 do
 	function Panel:NewLeftToRightCheckbox()
 		local b = self:NewCheckButton(L.LeftToRight)
-		
-		b:SetScript('OnShow', function(self)
-			self:SetChecked(self:GetParent().owner:GetLeftToRight())
-		end)
-		b:SetScript('OnClick', function(self)
-			self:GetParent().owner:SetLeftToRight(self:GetChecked())
-		end)
+		b:SetScript("OnShow", function(self) self:SetChecked(self:GetParent().owner:GetLeftToRight()) end)
+		b:SetScript("OnClick", function(self) self:GetParent().owner:SetLeftToRight(self:GetChecked()) end)
 	end
-	
-	
-	function Panel:NewTopToBottomCheckbox()			
+
+	function Panel:NewTopToBottomCheckbox()
 		local b = self:NewCheckButton(L.TopToBottom)
-		
-		b:SetScript('OnShow', function(self)
-			self:SetChecked(self:GetParent().owner:GetTopToBottom())
-		end)
-		
-		b:SetScript('OnClick', function(self)
-			self:GetParent().owner:SetTopToBottom(self:GetChecked())
-		end)
+		b:SetScript("OnShow", function(self) self:SetChecked(self:GetParent().owner:GetTopToBottom()) end)
+
+		b:SetScript("OnClick", function(self) self:GetParent().owner:SetTopToBottom(self:GetChecked()) end)
 	end
 end

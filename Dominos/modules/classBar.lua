@@ -2,7 +2,7 @@ assert(Dominos, "Dominos not found!")
 local Dominos = Dominos
 
 --libs and omgspeed
-local _G = getfenv(0)
+local _G = _G
 local format = string.format
 
 local BUTTON_SIZE = 30

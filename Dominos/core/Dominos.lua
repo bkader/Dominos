@@ -31,6 +31,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 --]]
 Dominos = LibStub("AceAddon-3.0"):NewAddon("Dominos", "AceEvent-3.0", "AceConsole-3.0")
+Dominos.callbacks = Dominos.callbacks or LibStub("CallbackHandler-1.0"):New(Dominos)
+
 local L = LibStub("AceLocale-3.0"):GetLocale("Dominos")
 local CURRENT_VERSION = GetAddOnMetadata("Dominos", "Version")
 
@@ -148,6 +150,8 @@ function Dominos:GetDefaults()
         petStyle = {"Entropy: Silver", 0.5, nil},
         classStyle = {"Entropy: Silver", 0.5, nil},
         bagStyle = {"Entropy: Bronze", 0.5, nil},
+        buffStyle = {"Entropy: Bronze", 0.5, nil},
+        debuffStyle = {"Entropy: Bronze", 0.5, nil},
         frames = {}
     }}
 end
@@ -215,6 +219,8 @@ function Dominos:Load()
         bf:Group("Dominos", "Pet Bar"):Skin(unpack(self.db.profile.petStyle))
         bf:Group("Dominos", "Class Bar"):Skin(unpack(self.db.profile.classStyle))
         bf:Group("Dominos", "Bag Bar"):Skin(unpack(self.db.profile.bagStyle))
+        bf:Group("Dominos", "Buffs"):Skin(unpack(self.db.profile.buffStyle))
+        bf:Group("Dominos", "Debuffs"):Skin(unpack(self.db.profile.debuffStyle))
     end
 
     -- load in extra functionality
@@ -247,9 +253,9 @@ end
 -- Blizzard Stuff Hiding
 function Dominos:HideBlizzard()
     local noop = Multibar_EmptyFunc
-    MultiActionBar_Update = noop
-    MultiActionBar_UpdateGrid = noop
-    ShowBonusActionBar = noop
+    _G.MultiActionBar_Update = noop
+    _G.MultiActionBar_UpdateGrid = noop
+    _G.ShowBonusActionBar = noop
 
     --hack, to make sure the seat indicator is placed in the right spot
     if not _G["VehicleSeatIndicator"]:IsUserPlaced() then
@@ -308,6 +314,10 @@ function Dominos:OnSkin(skin, glossAlpha, gloss, group, _, colors)
         styleDB = self.db.profile.classStyle
     elseif group == "Bag Bar" then
         styleDB = self.db.profile.bagStyle
+    elseif group == "Buffs" then
+        styleDB = self.db.profile.buffStyle
+    elseif group == "Debuffs" then
+        styleDB = self.db.profile.debuffStyle
     end
 
     if styleDB then
@@ -397,7 +407,7 @@ function Dominos:ListProfiles()
 end
 
 function Dominos:MatchProfile(name)
-    local name = name:lower()
+    name = name:lower()
     local nameRealm = name .. " - " .. GetRealmName():lower()
     local match
 
@@ -436,7 +446,7 @@ end
 
 -- Settings
 function Dominos:SetFrameSets(id, sets)
-    local id = tonumber(id) or id
+    id = tonumber(id) or id
     self.db.profile.frames[id] = sets
     return self.db.profile.frames[id]
 end
@@ -859,21 +869,21 @@ function Dominos:SetUseCastbar(enable)
 end
 
 --buff frame
-function Dominos:UseBuffs()
-    return self.db.profile.useBuffs
+function Dominos:UseAuras()
+    return self.db.profile.useAuras
 end
 
-function Dominos:SetUseBuffs(enable)
-    self.db.profile.useBuffs = enable or false
+function Dominos:SetUseAuras(enable)
+    self.db.profile.useAuras = enable or false
 end
 
---debuff frame
-function Dominos:UseDebuffs()
-    return self.db.profile.useDebuffs
+--objectives tracker
+function Dominos:UseQuest()
+    return self.db.profile.useQuest
 end
 
-function Dominos:SetUseDebuffs(enable)
-    self.db.profile.useDebuffs = enable or false
+function Dominos:SetUseQuest(enable)
+    self.db.profile.useQuest = enable or false
 end
 
 --minimap frame
@@ -883,15 +893,6 @@ end
 
 function Dominos:SetUseMinimap(enable)
     self.db.profile.useMinimap = enable or false
-end
-
---quest frame
-function Dominos:UseQuest()
-    return self.db.profile.useQuest
-end
-
-function Dominos:SetUseQuest(enable)
-    self.db.profile.useQuest = enable or false
 end
 
 --minimap button

@@ -2,7 +2,7 @@ assert(Dominos, "Dominos not found!")
 local Dominos = Dominos
 
 local NT_RATIO = 64/37
-local _G = getfenv(0)
+local _G = _G
 local LBF = LibStub('LibButtonFacade', true)
 
 --load up the bag set...

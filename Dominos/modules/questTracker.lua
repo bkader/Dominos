@@ -1,17 +1,22 @@
 assert(Dominos, "Dominos not found!")
-local Q, L
 local mod = Dominos:NewModule("QuestLog")
 local class = Dominos:CreateClass("Frame", Dominos.Frame)
-
-RANDOM_WIDTH_THAT_WONT_BE_OVER_WRITTEN = {}
+local LD, L = LibStub("AceLocale-3.0"):GetLocale("Dominos")
 
 function mod:Load()
+	if not Dominos:UseQuest() then
+		self:Unload()
+		return
+	end
+
 	self.frame = class:New()
 	self.frame:SetFrameStrata("LOW")
 end
 
 function mod:Unload()
-	self.frame:Free()
+	if self.frame then
+		self.frame:Free()
+	end
 end
 
 function class:New()
@@ -57,22 +62,9 @@ function class:OnLoad()
 	self.WFC.scrollframe.scroll.scrollStep = 1
 	self.WFC.scrollframe.scroll:SetWidth(15)
 
-	self.WFC.scrollframe.scroll:SetScript("OnValueChanged", function(self, value)
-		self:GetParent():SetVerticalScroll(value)
-	end)
-
-	local function scrollbar_OnScroll(x, arg1)
-		local step = (self.WFC.scrollframe.scroll:GetValueStep() * arg1) * 10
-		local value = self.WFC.scrollframe.scroll:GetValue()
-		local minVal, maxVal = self.WFC.scrollframe.scroll:GetMinMaxValues()
-		self.WFC.scrollframe.scroll:SetValue(min(value - step, step > 0 and maxVal or minVal))
-	end
-
-	self.WFC.scrollframe:SetScript("OnMouseWheel", scrollbar_OnScroll)
-	self.WFC.scrollframe.scroll:SetScript("OnMouseWheel", scrollbar_OnScroll)
+	self.WFC.scrollframe.scroll:SetScript("OnValueChanged", function(self, value) self:GetParent():SetVerticalScroll(value) end)
 
 	class:EnableScroll(self)
-	self.WFC:SetScript("OnUpdate", function(self) self:EnableMouse(false) end)
 	self.scrollchild = CreateFrame("Frame", "scrollchild", self.WFC.scrollframe)
 	self.WFC.scrollframe:SetScrollChild(self.scrollchild)
 	self.scrollchild:SetHeight(self.sets.height)
@@ -80,9 +72,8 @@ function class:OnLoad()
 	self.WFC:RegisterEvent("QUEST_LOG_UPDATE")
 	self.WFC:SetScript("OnEvent", function() class:SetUpContainer(self) end)
 end
---
 
---[[Layout]]
+--[[Layout]]--
 function class:Layout()
 	self.WFC:SetParent(self)
 	local pad = self.sets.padding - 4
@@ -95,10 +86,10 @@ function class:Layout()
 	local w = self.WFC.scrollframe:GetWidth() - 14
 	self.scrollchild:SetWidth(w)
 
-	WATCHFRAME_EXPANDEDWIDTH = w
-	WATCHFRAME_MAXLINEWIDTH = WATCHFRAME_EXPANDEDWIDTH - 12
+	_G.WATCHFRAME_EXPANDEDWIDTH = w
+	_G.WATCHFRAME_MAXLINEWIDTH = _G.WATCHFRAME_EXPANDEDWIDTH - 12
 
-	RANDOM_WIDTH_THAT_WONT_BE_OVER_WRITTEN = self.scrollchild:GetWidth()
+	_G.RANDOM_WIDTH_THAT_WONT_BE_OVER_WRITTEN = self.scrollchild:GetWidth()
 	WatchFrame:SetWidth(w - 5)
 	WatchFrame_Update()
 end
@@ -106,28 +97,46 @@ end
 do
 	-- the following function doesn't work for some reason, i need
 	-- to check more why and try to fix it.
-	-- local function scrollbar_OnScroll(x, arg1)
-	-- 	print(x, arg1)
-	-- 	local step = (self.WFC.scrollframe.scroll:GetValueStep() * arg1)
-	-- 	local value = self.WFC.scrollframe.scroll:GetValue()
-	-- 	local minVal, maxVal = self.WFC.scrollframe.scroll:GetMinMaxValues()
-	-- 	if step > 0 then
-	-- 		self.WFC.scrollframe.scroll:SetValue(min(value - step, maxVal))
-	-- 	else
-	-- 		self.WFC.scrollframe.scroll:SetValue(max(value - step, minVal))
-	-- 	end
-	-- end
+	local function scrollbar_OnScroll(self, arg1)
+		local WFC = self.WFC
+		if not WFC or WFC:GetName() ~= "DominosQuestFrame" then
+			WFC = self
+		end
+		if not WFC or WFC:GetName() ~= "DominosQuestFrame" then
+			WFC = WFC:GetParent()
+		end
+		if not WFC or WFC:GetName() ~= "DominosQuestFrame" then
+			WFC = WFC:GetParent()
+		end
 
-	function class:EnableScroll(self)
-		if not self.sets.disablescroll then
-			self.WFC.scrollframe.scroll:Show()
-			-- self.WFC.scrollframe:SetScript("OnMouseWheel", scrollbar_OnScroll)
-			-- self.WFC.scrollframe.scroll:SetScript("OnMouseWheel", scrollbar_OnScroll)
+		local step = (WFC.scrollframe.scroll:GetValueStep() * arg1)
+		local value = WFC.scrollframe.scroll:GetValue()
+		local minVal, maxVal = WFC.scrollframe.scroll:GetMinMaxValues()
+		if step > 0 then
+			WFC.scrollframe.scroll:SetValue(min(value - step, maxVal))
 		else
-			self.WFC.scrollframe.scroll:SetValue(1)
-			self.WFC.scrollframe.scroll:Hide()
-			-- self.WFC.scrollframe:SetScript("OnMouseWheel", nil)
-			-- self.WFC.scrollframe.scroll:SetScript("OnMouseWheel", nil)
+			WFC.scrollframe.scroll:SetValue(max(value - step, minVal))
+		end
+	end
+
+	function class:EnableScroll(f)
+		if not f.sets.disablescroll then
+			f.WFC.scrollframe.scroll:Show()
+			f.WFC.scrollframe:EnableMouseWheel(true)
+			f.WFC.scrollframe.scroll:EnableMouseWheel(true)
+			f.WFC.scrollframe:SetScript("OnMouseWheel", scrollbar_OnScroll)
+			f.WFC.scrollframe.scroll:SetScript("OnMouseWheel", scrollbar_OnScroll)
+			f:EnableMouseWheel(false)
+			f:SetScript("OnMouseWheel", nil)
+		else
+			f.WFC.scrollframe.scroll:SetValue(1)
+			f.WFC.scrollframe.scroll:Hide()
+			f.WFC.scrollframe:EnableMouseWheel(false)
+			f.WFC.scrollframe.scroll:EnableMouseWheel(false)
+			f.WFC.scrollframe:SetScript("OnMouseWheel", nil)
+			f.WFC.scrollframe.scroll:SetScript("OnMouseWheel", nil)
+			f:EnableMouseWheel(true)
+			f:SetScript("OnMouseWheel", scrollbar_OnScroll)
 		end
 	end
 end
@@ -155,14 +164,10 @@ function class:SetUpContainer(self)
 
 	WatchFrameCollapseExpandButton:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self)
-		GameTooltip:AddLine("Dominos Minimap", 1, 1, 1)
-		if WatchFrame.collapsed then
-			GameTooltip:AddLine("Left-click to expand the objectives tracker.")
-		else
-			GameTooltip:AddLine("Left-click to minimize the objectives tracker.")
-		end
-		GameTooltip:AddLine("Right-click to toggle the quest log.")
-		GameTooltip:AddLine("Shift-click to toggle the achievements window.")
+		GameTooltip:AddLine(LD["Objectives Tracker"], 1, 1, 1)
+		GameTooltip:AddLine(WatchFrame.collapsed and LD.QuestLClick1 or LD.QuestLClick2)
+		GameTooltip:AddLine(LD.QuestRClick)
+		GameTooltip:AddLine(LD.QuestSClick)
 		GameTooltip:Show()
 	end)
 
@@ -170,10 +175,8 @@ function class:SetUpContainer(self)
 	--Had to increase the frame level so
 	--the button would stay on top of the scroll bar
 	WatchFrameCollapseExpandButton:SetFrameLevel(self.WFC.scrollframe.scroll:GetFrameLevel() + 3)
-	WatchFrameCollapseExpandButton.Hide = function()
-	end
-	WatchFrameCollapseExpandButton.Disable = function()
-	end
+	WatchFrameCollapseExpandButton.Hide = function() end
+	WatchFrameCollapseExpandButton.Disable = function() end
 	WatchFrameCollapseExpandButton:RegisterForClicks("AnyDown")
 	WatchFrameCollapseExpandButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	WatchFrameCollapseExpandButton:SetScript("OnClick", function(_, btn)
@@ -207,7 +210,7 @@ function class:SetUpContainer(self)
 	WatchFrameLines:SetPoint("BOTTOMRIGHT", WatchFrame, "BOTTOMRIGHT", -24, 12)
 end
 
---[[Layout Panel--]]
+--[[ Layout Panel ]]--
 local function CreateWidthSlider(p)
 	local s = p:NewSlider("Width", 1, 160, 1)
 	s.OnShow = function(self)
@@ -221,7 +224,7 @@ local function CreateWidthSlider(p)
 end
 
 local function CreateHeightSlider(p)
-	local s = p:NewSlider("Height", 50, math.floor(GetScreenHeight()), 1, OnShow)
+	local s = p:NewSlider("Height", 50, math.floor(GetScreenHeight()), 1)
 	s.OnShow = function(self)
 		self:SetValue(self:GetParent().owner.sets.height)
 	end
@@ -233,7 +236,7 @@ local function CreateHeightSlider(p)
 end
 
 local function CreatePaddingSlider(p)
-	local s = p:NewSlider("Padding", -10, 90, 1, OnShow)
+	local s = p:NewSlider("Padding", -10, 90, 1)
 	s.OnShow = function(self)
 		self:SetValue(self:GetParent().owner.sets.padding)
 	end
@@ -255,18 +258,14 @@ local function AddLayoutPanel(menu)
 	p:NewScaleSlider()
 
 	local ToggleScroll = p:NewCheckButton("Disable ScrollBar")
-	ToggleScroll:SetScript("OnClick", function(self)
-		self:GetParent().owner:ToggleScroll(self:GetChecked())
-	end)
-	ToggleScroll:SetScript("OnShow", function(self)
-		self:SetChecked(self:GetParent().owner.sets.disablescroll)
-	end)
+	ToggleScroll:SetScript("OnClick", function(self) self:GetParent().owner:ToggleScroll(self:GetChecked()) end)
+	ToggleScroll:SetScript("OnShow", function(self) self:SetChecked(self:GetParent().owner.sets.disablescroll) end)
 end
 
 --[[ Menu Code ]]
 function class:CreateMenu()
 	local menu = Dominos:NewMenu(self.id)
-	L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
+	L = L or LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
 	AddLayoutPanel(menu)
 	self.menu = menu
 end

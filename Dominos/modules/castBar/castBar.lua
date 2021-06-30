@@ -34,13 +34,11 @@
 
 local L = LibStub('AceLocale-3.0'):GetLocale('Dominos')
 local Dominos = Dominos
-local enabled = false
 local DCB = Dominos:NewModule('CastingBar')
 local CastBar, CastingBar
 
 function DCB:Load()
-  enabled = (Dominos.db.profile.useCastbar == 1)
-  if not enabled then
+  if not Dominos:UseCastbar() then
     if self.frame then self:Unload() end
     return
   end
@@ -138,7 +136,7 @@ function CastingBar:New(parent)
 	f:SetPoint('CENTER')
 
 	local name = f:GetName()
-	local _G = getfenv(0)
+	local _G = _G
 	f.time = _G[name .. 'Time']
 	f.text = _G[name .. 'Text']
 	f.borderTexture = _G[name .. 'Border']

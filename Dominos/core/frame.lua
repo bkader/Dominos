@@ -1,8 +1,7 @@
 --[[
-	frame.lua
-		A dominos frame, a generic container object
+frame.lua
+	A dominos frame, a generic container object
 --]]
-
 --[[
 	Copyright (c) 2008-2009 Jason Greer
 	All rights reserved.
@@ -31,8 +30,11 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 --]]
+assert(Dominos, "Dominos not found!")
+local Dominos = Dominos
+local FlyPaper = _G.FlyPaper
 
-local Frame = Dominos:CreateClass('Frame')
+local Frame = Dominos:CreateClass("Frame")
 Dominos.Frame = Frame
 
 local FadeManager = Dominos.FadeManager
@@ -41,7 +43,7 @@ local unused = {}
 
 --constructor
 function Frame:New(id, tooltipText)
-	local id = tonumber(id) or id
+	id = tonumber(id) or id
 	local f = self:Restore(id) or self:Create(id)
 	f:LoadSettings()
 	f.buttons = {}
@@ -52,13 +54,13 @@ function Frame:New(id, tooltipText)
 end
 
 function Frame:Create(id)
-	local f = self:Bind(CreateFrame('Frame', nil, UIParent))
+	local f = self:Bind(CreateFrame("Frame", nil, UIParent))
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)
 	f.id = id
 
-	f.header = CreateFrame('Frame', nil, f, 'SecureHandlerStateTemplate')
-	f.header:SetAttribute('_onstate-display', [[
+	f.header = CreateFrame("Frame", nil, f, "SecureHandlerStateTemplate")
+	f.header:SetAttribute("_onstate-display", [[
 		local newstate = newstate or 'show'
 		if newstate == 'hide' then
 			self:SetAttribute('frame-alpha', nil)
@@ -92,11 +94,13 @@ end
 function Frame:Free()
 	active[self.id] = nil
 
-	UnregisterStateDriver(self.header, 'display', 'show')
+	UnregisterStateDriver(self.header, "display", "show")
 	FadeManager:Remove(self)
 
-	for i in pairs(self.buttons) do
-		self:RemoveButton(i)
+	if self.buttons then
+		for i in pairs(self.buttons) do
+			self:RemoveButton(i)
+		end
 	end
 	self.buttons = nil
 	self.docked = nil
@@ -107,6 +111,7 @@ function Frame:Free()
 	self:Hide()
 
 	unused[self.id] = self
+	Dominos.callbacks:Fire("DOMINOS_FREE", self)
 end
 
 function Frame:Delete()
@@ -135,9 +140,7 @@ function Frame:LoadSettings(defaults)
 	self:UpdateFader()
 end
 
-
 --[[ Layout ]]--
-
 --this function is used in a lot of places, but never called in Frame
 function Frame:LoadButtons()
 	for i = 1, self:NumButtons() do
@@ -171,6 +174,7 @@ function Frame:SetNumButtons(numButtons)
 	self.sets.numButtons = numButtons
 	self:UpdateButtonCount(self:NumButtons())
 	self:Layout()
+	Dominos.callbacks:Fire("DOMINOS_SETNUMBUTTONS", self, self.sets.numButtons)
 end
 
 function Frame:NumButtons()
@@ -180,6 +184,7 @@ end
 function Frame:SetColumns(columns)
 	self.sets.columns = columns ~= self:NumButtons() and columns or nil
 	self:Layout()
+	Dominos.callbacks:Fire("DOMINOS_SETCOLUMNS", self, self.sets.columns)
 end
 
 function Frame:NumColumns()
@@ -189,6 +194,7 @@ end
 function Frame:SetSpacing(spacing)
 	self.sets.spacing = spacing
 	self:Layout()
+	Dominos.callbacks:Fire("DOMINOS_SETSPACING", self, spacing)
 end
 
 function Frame:GetSpacing()
@@ -199,6 +205,7 @@ function Frame:SetPadding(w, h)
 	self.sets.padW = w
 	self.sets.padH = h or w
 	self:Layout()
+	Dominos.callbacks:Fire("DOMINOS_SETPADDING", self, self.sets.padW, self.sets.padH)
 end
 
 function Frame:GetPadding()
@@ -242,13 +249,13 @@ function Frame:Layout()
 		local w = b:GetWidth() + spacing
 		local h = b:GetHeight() + spacing
 
-		for i,b in pairs(self.buttons) do
+		for i, btn in pairs(self.buttons) do
 			local col
 			local row
 			if isLeftToRight then
-				col = (i-1) % cols
+				col = (i - 1) % cols
 			else
-				col = (cols-1) - (i-1) % cols
+				col = (cols - 1) - (i - 1) % cols
 			end
 
 			if isTopToBottom then
@@ -257,12 +264,12 @@ function Frame:Layout()
 				row = rows - ceil(i / cols)
 			end
 
-			b:ClearAllPoints()
-			b:SetPoint('TOPLEFT', w*col + pW, -(h*row + pH))
+			btn:ClearAllPoints()
+			btn:SetPoint("TOPLEFT", w * col + pW, -(h * row + pH))
 		end
 
-		width = w*cols - spacing + pW*2
-		height = h*ceil(#self.buttons/cols) - spacing + pH*2
+		width = w * cols - spacing + pW * 2
+		height = h * ceil(#self.buttons / cols) - spacing + pH * 2
 	else
 		width = 30
 		height = 30
@@ -272,28 +279,26 @@ function Frame:Layout()
 	self:SetHeight(max(height, 8))
 end
 
-
 --[[ Scaling ]]--
-
 function Frame:GetScaledCoords(scale)
 	local ratio = self:GetScale() / scale
 	return (self:GetLeft() or 0) * ratio, (self:GetTop() or 0) * ratio
 end
 
 function Frame:SetFrameScale(scale, scaleAnchored)
-	local x, y =  self:GetScaledCoords(scale)
+	local x, y = self:GetScaledCoords(scale)
 
 	self.sets.scale = scale
 	self:Rescale()
 
 	if not self.sets.anchor then
 		self:ClearAllPoints()
-		self:SetPoint('TOPLEFT', self:GetParent(), 'BOTTOMLEFT', x, y)
+		self:SetPoint("TOPLEFT", self:GetParent(), "BOTTOMLEFT", x, y)
 		self:SavePosition()
 	end
 
 	if scaleAnchored then
-		for _,f in self:GetAll() do
+		for _, f in self:GetAll() do
 			if f:GetAnchor() == self then
 				f:SetFrameScale(scale, true)
 			end
@@ -304,16 +309,14 @@ end
 function Frame:Rescale()
 	self:SetScale(self:GetScale())
 	self.drag:SetScale(self:GetScale())
+	Dominos.callbacks:Fire("DOMINOS_RESCALE", self)
 end
 
 function Frame:GetScale()
 	return self.sets.scale or 1
 end
 
-
 --[[ Opacity ]]--
-
-
 function Frame:SetFrameAlpha(alpha)
 	if alpha == 1 then
 		self.sets.alpha = nil
@@ -329,7 +332,7 @@ end
 
 --faded opacity (mouse not over the f)
 function Frame:SetFadeMultiplier(alpha)
-	local alpha = alpha or 1
+	alpha = alpha or 1
 	if alpha == 1 then
 		self.sets.fadeAlpha = nil
 	else
@@ -348,6 +351,7 @@ end
 --fadedPercentage is what modifier we use on normal opacity
 function Frame:UpdateAlpha()
 	self:SetAlpha(self:GetExpectedAlpha())
+	Dominos.callbacks:Fire("DOMINOS_SETALPHA", self)
 end
 
 function Frame:GetExpectedAlpha()
@@ -358,7 +362,7 @@ function Frame:GetExpectedAlpha()
 		end
 	end
 
-	local stateAlpha = self.header:GetAttribute('frame-alpha')
+	local stateAlpha = self.header:GetAttribute("frame-alpha")
 	if stateAlpha then
 		return stateAlpha
 	end
@@ -373,12 +377,12 @@ end
 
 local function isChildFocus(...)
 	local focus = GetMouseFocus()
-	for i = 1, select('#', ...) do
+	for i = 1, select("#", ...) do
 		if focus == select(i, ...) then
 			return true
 		end
 	end
-	for i = 1, select('#', ...) do
+	for i = 1, select("#", ...) do
 		local f = select(i, ...)
 		if f:IsShown() and isChildFocus(f:GetChildren()) then
 			return true
@@ -391,14 +395,14 @@ end
 if Frame.IsMouseOver then
 	function Frame:IsFocus()
 		if self:IsMouseOver(1, -1, -1, 1) then
-			return (GetMouseFocus() == _G['WorldFrame']) or isChildFocus(self:GetChildren())
+			return (GetMouseFocus() == _G["WorldFrame"]) or isChildFocus(self:GetChildren())
 		end
 		return Dominos:IsLinkedOpacityEnabled() and self:IsDockedFocus()
 	end
 else
 	function Frame:IsFocus()
 		if MouseIsOver(self, 1, -1, -1, 1) then
-			return (GetMouseFocus() == _G['WorldFrame']) or isChildFocus(self:GetChildren())
+			return (GetMouseFocus() == _G["WorldFrame"]) or isChildFocus(self:GetChildren())
 		end
 		return Dominos:IsLinkedOpacityEnabled() and self:IsDockedFocus()
 	end
@@ -407,8 +411,8 @@ end
 function Frame:IsDockedFocus()
 	local docked = self.docked
 	if docked then
-		for _,f in pairs(docked) do
-			if f:IsFocus()  then
+		for _, f in pairs(docked) do
+			if f:IsFocus() then
 				return true
 			end
 		end
@@ -417,12 +421,12 @@ function Frame:IsDockedFocus()
 end
 
 --[[ Visibility ]]--
-
 function Frame:ShowFrame()
 	self.sets.hidden = nil
 	self:Show()
 	self:UpdateFader()
 	self.drag:UpdateColor()
+	Dominos.callbacks:Fire("DOMINOS_SHOW", self)
 end
 
 function Frame:HideFrame()
@@ -430,6 +434,7 @@ function Frame:HideFrame()
 	self:Hide()
 	self:UpdateFader()
 	self.drag:UpdateColor()
+	Dominos.callbacks:Fire("DOMINOS_HIDE", self)
 end
 
 function Frame:ToggleFrame()
@@ -444,9 +449,7 @@ function Frame:FrameIsShown()
 	return not self.sets.hidden
 end
 
-
 --[[ Show states ]]--
-
 function Frame:SetShowStates(states)
 	self.sets.showstates = states
 	self:UpdateShowStates()
@@ -457,8 +460,8 @@ function Frame:GetShowStates()
 
 	--hack to convert [combat] into [combat]show;hide in case a user is using the old style of showstates
 	if states then
-		if states:sub(#states) == ']' then
-			states = states .. 'show;hide'
+		if states:sub(#states) == "]" then
+			states = states .. "show;hide"
 			self.sets.showstates = states
 		end
 	end
@@ -469,36 +472,34 @@ end
 function Frame:UpdateShowStates()
 	local showstates = self:GetShowStates()
 	if showstates then
-		RegisterStateDriver(self.header, 'display', showstates)
-		self.header:SetAttribute('state-display', SecureCmdOptionParse(showstates))
+		RegisterStateDriver(self.header, "display", showstates)
+		self.header:SetAttribute("state-display", SecureCmdOptionParse(showstates))
 	else
-		UnregisterStateDriver(self.header, 'display')
+		UnregisterStateDriver(self.header, "display")
 		self.header:Show()
 	end
 end
 
-
 --[[ Lock/Unlock ]]--
-
 function Frame:Lock()
 	self.drag:Hide()
+	Dominos.callbacks:Fire("DOMINOS_LOCK", self)
 end
 
 function Frame:Unlock()
 	self.drag:Show()
+	Dominos.callbacks:Fire("DOMINOS_UNLOCK", self)
 end
 
-
 --[[ Sticky Bars ]]--
-
 Frame.stickyTolerance = 16
 
 function Frame:StickToEdge()
 	local point, x, y = self:GetRelPosition()
 	local s = self:GetScale()
-	local w = self:GetParent():GetWidth()/s
-	local h = self:GetParent():GetHeight()/s
-	local rTolerance = self.stickyTolerance/s
+	local w = self:GetParent():GetWidth() / s
+	local h = self:GetParent():GetHeight() / s
+	local rTolerance = self.stickyTolerance / s
 	local changed = false
 
 	--sticky edges
@@ -515,22 +516,22 @@ function Frame:StickToEdge()
 	-- auto centering
 	local cX, cY = self:GetCenter()
 	if y == 0 then
-		if abs(cX - w/2) <= rTolerance*2 then
-			if point == 'TOPLEFT' or point == 'TOPRIGHT' then
-				point = 'TOP'
+		if abs(cX - w / 2) <= rTolerance * 2 then
+			if point == "TOPLEFT" or point == "TOPRIGHT" then
+				point = "TOP"
 			else
-				point = 'BOTTOM'
+				point = "BOTTOM"
 			end
 
 			x = 0
 			changed = true
 		end
 	elseif x == 0 then
-		if abs(cY - h/2) <= rTolerance*2 then
-			if point == 'TOPLEFT' or point == 'BOTTOMLEFT' then
-				point = 'LEFT'
+		if abs(cY - h / 2) <= rTolerance * 2 then
+			if point == "TOPLEFT" or point == "BOTTOMLEFT" then
+				point = "LEFT"
 			else
-				point = 'RIGHT'
+				point = "RIGHT"
 			end
 
 			y = 0
@@ -552,7 +553,7 @@ end
 function Frame:ClearAnchor()
 	local anchor, point = self:GetAnchor()
 	if anchor and anchor.docked then
-		for i,f in pairs(anchor.docked) do
+		for i, f in pairs(anchor.docked) do
 			if f == self then
 				tremove(anchor.docked, i)
 				break
@@ -565,6 +566,7 @@ function Frame:ClearAnchor()
 
 	self.sets.anchor = nil
 	self:UpdateFader()
+	Dominos.callbacks:Fire("DOMINOS_CLEARANCHOR", self, anchor, point)
 end
 
 function Frame:SetAnchor(anchor, point)
@@ -572,7 +574,7 @@ function Frame:SetAnchor(anchor, point)
 
 	if anchor.docked then
 		local found = false
-		for i,f in pairs(anchor.docked) do
+		for i, f in pairs(anchor.docked) do
 			if f == self then
 				found = i
 				break
@@ -587,6 +589,7 @@ function Frame:SetAnchor(anchor, point)
 
 	self.sets.anchor = anchor.id .. point
 	self:UpdateFader()
+	Dominos.callbacks:Fire("DOMINOS_SETANCHOR", self, anchor, point)
 end
 
 function Frame:Stick()
@@ -612,20 +615,22 @@ function Frame:Stick()
 
 	self:SavePosition()
 	self.drag:UpdateColor()
+	Dominos.callbacks:Fire("DOMINOS_STICK", self)
 end
 
 function Frame:Reanchor()
 	local f, point = self:GetAnchor()
-	if not(f and FlyPaper.StickToPoint(self, f, point)) then
+	if not (f and FlyPaper.StickToPoint(self, f, point)) then
 		self:ClearAnchor()
 		if not self:Reposition() then
 			self:ClearAllPoints()
-			self:SetPoint('CENTER')
+			self:SetPoint("CENTER")
 		end
 	else
 		self:SetAnchor(f, point)
 	end
 	self.drag:UpdateColor()
+	Dominos.callbacks:Fire("DOMINOS_REANCHOR", self, point)
 end
 
 function Frame:GetAnchor()
@@ -636,32 +641,31 @@ function Frame:GetAnchor()
 	end
 end
 
-
 --[[ Positioning ]]--
-
 function Frame:GetRelPosition()
 	local parent = self:GetParent()
 	local w, h = parent:GetWidth(), parent:GetHeight()
 	local x, y = self:GetCenter()
 	local s = self:GetScale()
-	w = w/s h = h/s
+	w = w / s
+	h = h / s
 
 	local dx, dy
-	local hHalf = (x > w/2) and 'RIGHT' or 'LEFT'
-	if hHalf == 'RIGHT' then
+	local hHalf = (x > w / 2) and "RIGHT" or "LEFT"
+	if hHalf == "RIGHT" then
 		dx = self:GetRight() - w
 	else
 		dx = self:GetLeft()
 	end
 
-	local vHalf = (y > h/2) and 'TOP' or 'BOTTOM'
-	if vHalf == 'TOP' then
+	local vHalf = (y > h / 2) and "TOP" or "BOTTOM"
+	if vHalf == "TOP" then
 		dy = self:GetTop() - h
 	else
 		dy = self:GetBottom()
 	end
 
-	return vHalf..hHalf, dx, dy
+	return vHalf .. hHalf, dx, dy
 end
 
 function Frame:SavePosition()
@@ -671,6 +675,8 @@ function Frame:SavePosition()
 	sets.point = point
 	sets.x = x
 	sets.y = y
+
+	Dominos.callbacks:Fire("DOMINOS_SAVEPOSITION", self, point, x, y)
 end
 
 --place the frame at it's saved position
@@ -684,6 +690,7 @@ function Frame:Reposition()
 		self:ClearAllPoints()
 		self:SetPoint(point, x, y)
 		self:SetUserPlaced(true)
+		Dominos.callbacks:Fire("DOMINOS_REPOSITION", self, point, x, y)
 		return true
 	end
 end
@@ -692,11 +699,10 @@ function Frame:SetFramePoint(...)
 	self:ClearAllPoints()
 	self:SetPoint(...)
 	self:SavePosition()
+	Dominos.callbacks:Fire("DOMINOS_SETPOINT", self)
 end
 
-
 --[[ Menus ]]--
-
 function Frame:CreateMenu()
 	self.menu = Dominos:NewMenu(self.id)
 	self.menu:AddLayoutPanel()
@@ -704,7 +710,7 @@ function Frame:CreateMenu()
 end
 
 function Frame:ShowMenu()
-	local enabled = select(4, GetAddOnInfo('Dominos_Config'))
+	local enabled = select(4, GetAddOnInfo("Dominos_Config"))
 	if enabled then
 		if not self.menu then
 			self:CreateMenu()
@@ -714,14 +720,13 @@ function Frame:ShowMenu()
 		if menu then
 			menu:Hide()
 			menu:SetOwner(self)
-			menu:ShowPanel(LibStub('AceLocale-3.0'):GetLocale('Dominos-Config').Layout)
+			menu:ShowPanel(LibStub("AceLocale-3.0"):GetLocale("Dominos-Config").Layout)
 			menu:Show()
 		end
 	end
 end
 
 --[[ Tooltip Text ]]--
-
 function Frame:SetTooltipText(text)
 	self.tooltipText = text
 end
@@ -730,9 +735,7 @@ function Frame:GetTooltipText()
 	return self.tooltipText
 end
 
-
 --[[ Utility ]]--
-
 --run the fade onupdate checker if only if there are mouseover fs to check
 function Frame:UpdateFader()
 	if self.sets.hidden then
@@ -742,9 +745,7 @@ function Frame:UpdateFader()
 	end
 end
 
-
 --[[ Metafunctions ]]--
-
 function Frame:Get(id)
 	return active[tonumber(id) or id]
 end
@@ -754,7 +755,7 @@ function Frame:GetAll()
 end
 
 function Frame:ForAll(method, ...)
-	for _,f in self:GetAll() do
+	for _, f in self:GetAll() do
 		local action = f[method]
 		if action then
 			action(f, ...)
@@ -765,10 +766,10 @@ end
 --takes a fID, and performs the specified action on that f
 --this adds two special IDs, 'all' for all fs and number-number for a range of IDs
 function Frame:ForFrame(id, method, ...)
-	if id == 'all' then
+	if id == "all" then
 		self:ForAll(method, ...)
 	else
-		local startID, endID = tostring(id):match('(%d+)-(%d+)')
+		local startID, endID = tostring(id):match("(%d+)-(%d+)")
 		startID = tonumber(startID)
 		endID = tonumber(endID)
 

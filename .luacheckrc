@@ -9,35 +9,21 @@ max_line_length = false
 max_code_line_length = false
 max_string_line_length = false
 max_comment_line_length = false
-
 allow_defined = true
-
 exclude_files = {
 	"./.git",
 	"./.github",
 	"./.lua",
 	"./.luarocks",
 	"**/Libs/**/*.lua",
-	"**/Libs/**/**/*.lua",
-	".luacheckrc",
-    "ElvUI_AddOnSkins/*",
-    "_dev/*",
+	".luacheckrc"
 }
 
 ignore = {
 	"11./SLASH_.*", -- Setting an undefined (Slash handler) global variable
 	"11./BINDING_.*", -- Setting an undefined (Keybinding header) global variable
-	"111/[A-Z][A-Z0-9_]+",	-- Setting an undefined global variable
-	"113/[A-Z][A-Z0-9_]+",	-- Accessing an undefined global variable (GlobalStrings and Constants 2char+)
-	"131/[A-Z][A-Z0-9_]+",	-- Unused implicitly defined global variable (GlobalStrings and Constants 2char+)
-	"131/Skada.*",	-- Unsed global variable (Skada.*)
-	"314", -- Value of a field in a table literal is unused
-	"42.", -- Shadowing a local variable, an argument, a loop variable.
-	"11./SLASH_.*", -- Setting an undefined (Slash handler) global variable
-	"11./BINDING_.*", -- Setting an undefined (Keybinding header) global variable
 	"113/LE_.*", -- Accessing an undefined (Lua ENUM type) global variable
 	"113/NUM_LE_.*", -- Accessing an undefined (Lua ENUM type) global variable
-	"113/L_.*", -- Accessing an undefined (L_) global variable
 	"111/[A-Z][A-Z0-9_]+",	-- Setting an undefined global variable
 	"113/[A-Z][A-Z0-9_]+",	-- Accessing an undefined global variable (GlobalStrings and Constants 2char+)
 	"211", -- Unused local variable
@@ -47,133 +33,43 @@ ignore = {
 	"213", -- Unused loop variable
 	"231/_.*", -- unused variables starting with _
 	"311", -- Value assigned to a local variable is unused
-	"312/self", -- Value assigned is overwritten
 --	"431", -- shadowing upvalue
 	"43.", -- Shadowing an upvalue, an upvalue argument, an upvalue loop variable.
 	"542", -- An empty if branch
 }
 
 globals = {
-	-- compat
-	"tInvert",
-	"Round",
-	"tIndexOf",
-	"IsInGroup",
-	"IsInRaid",
-	"GetNumSubgroupMembers",
-	"GetNumGroupMembers",
-	"DBMLichKingFrameDragTitle",
-	"DBMKalFrameDragTitle",
-
-	"AceGUIWidgetLSMlists",
-	"UIDropDownMenu_AddSeparator",
-
-	"nop",
-	"ActorPoolMixin",
-	"ActorPool_Hide",
-	"ActorPool_HideAndClearModel",
-	"CreateActorPool",
-	"CreateFixedSizeFramePoolCollection",
-	"CreateFontStringPool",
-	"CreateForbiddenFrame",
-	"CreateFramePool",
-	"CreateFramePoolCollection",
-	"CreateFromMixins",
-	"CreateObjectPool",
-	"CreateTexturePool",
-	"FixedSizeFramePoolCollectionMixin",
-	"FontStringPoolMixin",
-	"FontStringPool_Hide",
-	"FontStringPool_HideAndClearAnchors",
-	"FramePoolCollectionMixin",
-	"FramePoolMixin",
-	"FramePool_Hide",
-	"FramePool_HideAndClearAnchors",
-	"ObjectPoolMixin",
-	"TexturePoolMixin",
-	"TexturePool_Hide",
-	"TexturePool_HideAndClearAnchors",
-
 	"_G",
 	"bit",
-	"Recount",
-	"Skada",
+
+	-- dominos
+	"GetMinimapShape",
+	"MultiActionBar_Update",
+	"MultiActionBar_UpdateGrid",
+	"ShowBonusActionBar",
+	"FFF_ReputationWatchBar_OnClick",
+	"FFF_ReputationWatchBar_OnEnter",
+	"FFF_ReputationWatchBar_OnLeave",
+
 	-- misc custom
 	"CUSTOM_CLASS_COLORS",
+	"L_UIDropDownMenu_CreateInfo",
+	"UnitDied",
+	"AceGUIWidgetLSMlists",
+	"L_UIDropDownMenu_AddButton",
+	"L_CloseDropDownMenus",
+	"L_ToggleDropDownMenu",
+	"IsInParty",
+	"IsInRaid",
+	"IsInGroup",
+	"ChatThrottleLib",
+	"ElvUI",
 	"LibStub",
 	"BigWigs",
-	"ElvUI",
 	"BigBrother",
 	"Transcriptor",
 	"KuiNameplates",
-	"aura_env",
-	"WeakAuras",
-	"WeakAurasSaved",
-	"TidyPlatesThreatDBM",
 	"Plater",
-	"DBMLichKingFrameDrag",
-	"DBMKalFrameDrag",
-	-- DBM
-	"DBM_ADD",
-	"DBM_ADDS",
-	"DBM_ALLY",
-	"DBM_BIG_ADD",
-	"DBM_BOSS",
-	"DBM_BossPreview",
-	"DBM_CORE_ALLY",
-	"DBM_CORE_AUTO_ANNOUNCE_OPTIONS",
-	"DBM_CORE_AUTO_ANNOUNCE_TEXTS",
-	"DBM_CORE_AUTO_SPEC_WARN_OPTIONS",
-	"DBM_CORE_AUTO_SPEC_WARN_TEXTS",
-	"DBM_CORE_AUTO_TIMER_OPTIONS",
-	"DBM_CORE_AUTO_TIMER_TEXTS",
-	"DBM_CORE_AUTO_YELL_CUSTOM_FADE",
-	"DBM_CORE_BACK",
-	"DBM_CORE_BOSS_DOWN",
-	"DBM_CORE_BOTH",
-	"DBM_CORE_BREAK_LOS",
-	"DBM_CORE_CURSE_ICON",
-	"DBM_CORE_DAMAGE_ICON",
-	"DBM_CORE_DEADLY_ICON",
-	"DBM_CORE_DISEASE_ICON",
-	"DBM_CORE_HEALER_ICON",
-	"DBM_CORE_HEROIC_ICON",
-	"DBM_CORE_IMPORTANT_ICON",
-	"DBM_CORE_INFOFRAME_POWER",
-	"DBM_CORE_INTERMISSION",
-	"DBM_CORE_INTERRUPT_ICON",
-	"DBM_CORE_LEFT",
-	"DBM_CORE_MAGIC_ICON",
-	"DBM_CORE_MOVABLE_BAR",
-	"DBM_CORE_MOVE_WARNING_MESSAGE",
-	"DBM_CORE_OPTION_CATEGORY_DROPDOWNS",
-	"DBM_CORE_ORB",
-	"DBM_CORE_POISON_ICON",
-	"DBM_CORE_RIGHT",
-	"DBM_CORE_ROOM_EDGE",
-	"DBM_CORE_SHIELD",
-	"DBM_CORE_SIDE",
-	"DBM_CORE_TANK_ICON",
-	"DBM_CORE_TOP",
-	"DBM_CORE_UNKNOWN",
-	"DBM_DISABLE_ZONE_DETECTION",
-	"DBM_GUI_Bosses",
-	"DBM_GUI_Frame",
-	"DBM_GUI_Options",
-	"DBM_GUI_OptionsFrame",
-	"DBM_GUI_OptionsFrameBossMods",
-	"DBM_GUI_OptionsFramePanelContainer",
-	"DBM_GUI_OptionsFramePanelContainerFOV",
-	"DBM_GUI_Translations",
-	"DBM_GUI",
-	"DBM_INCOMING",
-	"DBM",
-	"DBMHudMap",
-	"DBMInfoFrame",
-	"DBMRangeCheck",
-	"DBMRangeCheckRadar",
-	"DBMVPSMGPack",
-	"DBMVPSoundEventsPack",
 	"DBT_AllPersistentOptions",
 	"DBT_PersistentOptions",
 	"DBT",
@@ -181,15 +77,12 @@ globals = {
 	"LOCALE_ruRU",
 	"LOCALE_zhCN",
 	"LOCALE_zhTW",
-	-- Temp DBM
-	"DBMBurningCrusade_SavedModOptions",
-	"DBMBC",
-	"DBM_SBT",
 
 	-- Sirus
 	"AnimationsToggle_STARTNUMBERS",
 	"TimerTracker",
 	"TimerTracker_OnEvent",
+	"C_Timer",
 	"C_Talent",
 	"TimerFrame",
 	"WorldStateTopCenterFrame",

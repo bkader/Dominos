@@ -16,7 +16,7 @@
 	<!-- Additional custom modules -->
 	<Script file="auraBuffsBar.lua" />
 	<Script file="auraDebuffsBar.lua" />
-	<!-- <Script file="minimapBar.lua" /> -->
-	<!-- <Script file="minimapZoneTextBar.lua" /> -->
+	<Script file="minimapBar.lua" />
+	<Script file="minimapZoneTextBar.lua" />
 	<Script file="questTracker.lua" />
 </Ui>

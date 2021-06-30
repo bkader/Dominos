@@ -1,40 +1,37 @@
 assert(Dominos, "Dominos not found!")
 local Dominos = Dominos
 
-local XP_FORMAT = '%s / %s [%s%%]'
-local REST_FORMAT = '%s / %s (+%s) [%s%%]'
-local REP_FORMAT = '%s:  %s / %s (%s)'
-local L = LibStub('AceLocale-3.0'):GetLocale('Dominos')
-local _G = getfenv(0)
+local XP_FORMAT = "%s / %s [%s%%]"
+local REST_FORMAT = "%s / %s (+%s) [%s%%]"
+local REP_FORMAT = "%s:  %s / %s (%s)"
+local L = LibStub("AceLocale-3.0"):GetLocale("Dominos")
+local _G = _G
 
 --taken from http://lua-users.org/wiki/FormattingNumbers
 --a semi clever way to format numbers with commas (ex, 1,000,000)
 local function comma_value(n)
-	local left,num,right = string.match(tostring(n), '^([^%d]*%d)(%d*)(.-)$')
-	return left..(num:reverse():gsub('(%d%d%d)','%1,'):reverse())..right
+	local left, num, right = string.match(tostring(n), "^([^%d]*%d)(%d*)(.-)$")
+	return left .. (num:reverse():gsub("(%d%d%d)", "%1,"):reverse()) .. right
 end
 
 --[[ Module Stuff ]]--
-
-local DXP = Dominos:NewModule('xp')
+local DXP = Dominos:NewModule("xp")
 local XP
 
 function DXP:Load()
 	self.frame = XP:New()
-	self.frame:SetFrameStrata('BACKGROUND')
+	self.frame:SetFrameStrata("BACKGROUND")
 end
 
 function DXP:Unload()
 	self.frame:Free()
 end
 
-
 --[[ XP Object ]]--
-
-XP = Dominos:CreateClass('Frame', Dominos.Frame)
+XP = Dominos:CreateClass("Frame", Dominos.Frame)
 
 function XP:New()
-	local f = self.super.New(self, 'xp')
+	local f = self.super.New(self, "xp")
 	if not f.value then
 		f:Load()
 	end
@@ -50,47 +47,49 @@ end
 function XP:GetDefaults()
 	return {
 		alwaysShowText = true,
-		point = 'TOP',
+		point = "TOP",
 		width = 0.75,
 		height = 14,
 		y = -32,
 		x = 0,
-		texture = 'blizzard'
+		texture = "blizzard"
 	}
 end
 
 function XP:Load()
-	local bg = self:CreateTexture(nil, 'BACKGROUND')
+	local bg = self:CreateTexture(nil, "BACKGROUND")
 	bg:SetAllPoints(self)
 	if bg.SetHorizTile then
 		bg:SetHorizTile(false)
 	end
 	self.bg = bg
 
-	local rest = CreateFrame('StatusBar', nil, self)
+	local rest = CreateFrame("StatusBar", nil, self)
 	rest:EnableMouse(false)
 	rest:SetAllPoints(self)
 	self.rest = rest
 
-	local value = CreateFrame('StatusBar', nil, rest)
+	local value = CreateFrame("StatusBar", nil, rest)
 	value:EnableMouse(false)
 	value:SetAllPoints(self)
 	self.value = value
 
-	local text = value:CreateFontString(nil, 'OVERLAY', 'GameFontHighlight')
-	text:SetPoint('CENTER')
+	local text = value:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	text:SetPoint("CENTER")
 	self.text = text
 
-	local click = CreateFrame('Button', nil, value)
-	click:SetScript('OnClick', function(_, ...) self:OnClick(...) end)
-	click:SetScript('OnEnter', function(_, ...) self:OnEnter(...) end)
-	click:SetScript('OnLeave', function(_, ...) self:OnLeave(...) end)
-	click:RegisterForClicks('anyUp')
+	local click = CreateFrame("Button", nil, value)
+	click:SetScript("OnClick", function(_, ...) self:OnClick(...) end)
+	click:SetScript("OnEnter", function(_, ...) self:OnEnter(...) end)
+	click:SetScript("OnLeave", function(_, ...) self:OnLeave(...) end)
+	click:RegisterForClicks("anyUp")
 	click:SetAllPoints(self)
+
+	self:UpdateTextShown()
 end
 
 function XP:OnClick(button)
-	if button == 'RightButton' and FFF_ReputationWatchBar_OnClick then
+	if button == "RightButton" and _G.FFF_ReputationWatchBar_OnClick then
 		self:SetAlwaysShowXP(false)
 		FFF_ReputationWatchBar_OnClick(self, button)
 	else
@@ -140,20 +139,18 @@ function XP:ShouldWatchFaction()
 	return (not self.sets.alwaysShowXP) and GetWatchedFactionInfo()
 end
 
-
 --[[ Experience ]]--
-
 function XP:WatchExperience()
 	self:UnregisterAllEvents()
-	self:SetScript('OnEvent', self.OnXPEvent)
+	self:SetScript("OnEvent", self.OnXPEvent)
 
 	if not self.sets.alwaysShowXP then
-		self:RegisterEvent('UPDATE_FACTION')
+		self:RegisterEvent("UPDATE_FACTION")
 	end
-	self:RegisterEvent('UPDATE_EXHAUSTION')
-	self:RegisterEvent('PLAYER_XP_UPDATE')
-	self:RegisterEvent('PLAYER_LEVEL_UP')
-	self:RegisterEvent('PLAYER_LOGIN')
+	self:RegisterEvent("UPDATE_EXHAUSTION")
+	self:RegisterEvent("PLAYER_XP_UPDATE")
+	self:RegisterEvent("PLAYER_LEVEL_UP")
+	self:RegisterEvent("PLAYER_LOGIN")
 
 	self.rest:SetStatusBarColor(0.25, 0.25, 1)
 	self.value:SetStatusBarColor(0.6, 0, 0.6)
@@ -162,7 +159,7 @@ function XP:WatchExperience()
 end
 
 function XP:OnXPEvent(event)
-	if event == 'UPDATE_FACTION' and self:ShouldWatchFaction() then
+	if event == "UPDATE_FACTION" and self:ShouldWatchFaction() then
 		self:WatchReputation()
 	else
 		self:UpdateExperience()
@@ -170,8 +167,8 @@ function XP:OnXPEvent(event)
 end
 
 function XP:UpdateExperience()
-	local value = UnitXP('player')
-	local max = UnitXPMax('player')
+	local value = UnitXP("player")
+	local max = UnitXPMax("player")
 	local pct = math.floor((value / math.max(max, 1)) * 100 + 0.5)
 
 	self.value:SetMinMaxValues(0, max)
@@ -189,13 +186,11 @@ function XP:UpdateExperience()
 	end
 end
 
-
 --[[ Reputation ]]--
-
 function XP:WatchReputation()
 	self:UnregisterAllEvents()
-	self:RegisterEvent('UPDATE_FACTION')
-	self:SetScript('OnEvent', self.OnRepEvent)
+	self:RegisterEvent("UPDATE_FACTION")
+	self:SetScript("OnEvent", self.OnRepEvent)
 
 	self.rest:SetValue(0)
 	self.rest:SetStatusBarColor(0, 0, 0, 0)
@@ -222,13 +217,11 @@ function XP:UpdateReputation()
 	self.value:SetMinMaxValues(0, max)
 	self.value:SetValue(value)
 
-	local repLevel = _G['FACTION_STANDING_LABEL' .. reaction]
+	local repLevel = _G["FACTION_STANDING_LABEL" .. reaction]
 	self.text:SetFormattedText(REP_FORMAT, name, comma_value(value), comma_value(max), repLevel)
 end
 
-
 --[[ Layout ]]--
-
 function XP:Layout()
 	self:SetWidth(GetScreenWidth() * self.sets.width)
 	self:SetHeight(self.sets.height)
@@ -240,9 +233,9 @@ function XP:SetTexture(texture)
 end
 
 function XP:UpdateTexture()
-	local LSM = LibStub('LibSharedMedia-3.0', true)
+	local LSM = LibStub("LibSharedMedia-3.0", true)
 
-	local texture = (LSM and LSM:Fetch('statusbar', self.sets.texture)) or DEFAULT_STATUSBAR_TEXTURE
+	local texture = (LSM and LSM:Fetch("statusbar", self.sets.texture)) or DEFAULT_STATUSBAR_TEXTURE
 	self.value:SetStatusBarTexture(texture)
 	if self.value:GetStatusBarTexture().SetHorizTile then
 		self.value:GetStatusBarTexture():SetHorizTile(false)
@@ -259,26 +252,13 @@ function XP:SetAlwaysShowXP(enable)
 	self:UpdateWatch()
 end
 
-
 --[[ Text ]]--
-
-if XP.IsMouseOver then
-	function XP:UpdateTextShown()
-		if self:IsMouseOver() or self.sets.alwaysShowText then
-			self.text:Show()
-		else
-			self.text:Hide()
-			self:Hide()
-		end
-	end
-else
-	function XP:UpdateTextShown()
-		if MouseIsOver(self) or self.sets.alwaysShowText then
-			self.text:Show()
-		else
-			self.text:Hide()
-			self:Hide()
-		end
+function XP:UpdateTextShown()
+	if (self.IsMouseOver and self:IsMouseOver()) or self:IsMouseOver() or self.sets.alwaysShowText then
+		self.text:Show()
+	else
+		self.text:Hide()
+		self:Hide()
 	end
 end
 
@@ -287,11 +267,7 @@ function XP:ToggleText(enable)
 	self:UpdateTextShown()
 end
 
-
---[[
-	Layout Panel
---]]
-
+--[[ Layout Panel ]]--
 local function CreateWidthSlider(p)
 	local s = p:NewSlider(L.Width, 1, 100, 1)
 
@@ -301,13 +277,13 @@ local function CreateWidthSlider(p)
 
 	s.UpdateValue = function(self, value)
 		local f = self:GetParent().owner
-		f.sets.width = value/100
+		f.sets.width = value / 100
 		f:Layout()
 	end
 end
 
 local function CreateHeightSlider(p)
-	local s = p:NewSlider(L.Height, 1, 128, 1, OnShow)
+	local s = p:NewSlider(L.Height, 1, 128, 1)
 
 	s.OnShow = function(self)
 		self:SetValue(self:GetParent().owner.sets.height)
@@ -321,7 +297,7 @@ local function CreateHeightSlider(p)
 end
 
 local function AddLayoutPanel(menu)
-	local p = menu:NewPanel(LibStub('AceLocale-3.0'):GetLocale('Dominos-Config').Layout)
+	local p = menu:NewPanel(LibStub("AceLocale-3.0"):GetLocale("Dominos-Config").Layout)
 
 	p:NewOpacitySlider()
 	p:NewFadeSlider()
@@ -330,19 +306,15 @@ local function AddLayoutPanel(menu)
 	CreateWidthSlider(p)
 
 	local showText = p:NewCheckButton(L.AlwaysShowText)
-	showText:SetScript('OnClick', function(self) self:GetParent().owner:ToggleText(self:GetChecked()) end)
-	showText:SetScript('OnShow', function(self) self:SetChecked(self:GetParent().owner.sets.alwaysShowText) end)
+	showText:SetScript("OnClick", function(self) self:GetParent().owner:ToggleText(self:GetChecked()) end)
+	showText:SetScript("OnShow", function(self) self:SetChecked(self:GetParent().owner.sets.alwaysShowText) end)
 
 	local showXP = p:NewCheckButton(L.AlwaysShowXP)
-	showXP:SetScript('OnClick', function(self) self:GetParent().owner:SetAlwaysShowXP(self:GetChecked()) end)
-	showXP:SetScript('OnShow', function(self) self:SetChecked(self:GetParent().owner.sets.alwaysShowXP) end)
+	showXP:SetScript("OnClick", function(self) self:GetParent().owner:SetAlwaysShowXP(self:GetChecked()) end)
+	showXP:SetScript("OnShow", function(self) self:SetChecked(self:GetParent().owner.sets.alwaysShowXP) end)
 end
 
-
---[[
-	Texture Picker
---]]
-
+--[[Texture Picker]]--
 --yeah I know I'm bad in that I didn't capitialize some constants
 local NUM_ITEMS = 9
 local width, height, offset = 140, 20, 2
@@ -353,13 +325,13 @@ local function TextureButton_OnClick(self)
 end
 
 local function TextureButton_OnMouseWheel(self, direction)
-	local scrollBar = _G[self:GetParent().scroll:GetName() .. 'ScrollBar']
-	scrollBar:SetValue(scrollBar:GetValue() - direction * (scrollBar:GetHeight()/2))
-	parent:UpdateList()
+	local scrollBar = _G[self:GetParent().scroll:GetName() .. "ScrollBar"]
+	scrollBar:SetValue(scrollBar:GetValue() - direction * (scrollBar:GetHeight() / 2))
+	self:GetParent():UpdateList()
 end
 
 local function TextureButton_Create(name, parent)
-	local button = CreateFrame('Button', name, parent)
+	local button = CreateFrame("Button", name, parent)
 	button:SetWidth(width)
 	button:SetHeight(height)
 
@@ -369,28 +341,28 @@ local function TextureButton_Create(name, parent)
 	local r, g, b = max(random(), 0.2), max(random(), 0.2), max(random(), 0.2)
 	button.bg:SetVertexColor(r, g, b)
 	button:EnableMouseWheel(true)
-	button:SetScript('OnClick', TextureButton_OnClick)
-	button:SetScript('OnMouseWheel', TextureButton_OnMouseWheel)
-	button:SetNormalFontObject('GameFontNormalLeft')
-	button:SetHighlightFontObject('GameFontHighlightLeft')
+	button:SetScript("OnClick", TextureButton_OnClick)
+	button:SetScript("OnMouseWheel", TextureButton_OnMouseWheel)
+	button:SetNormalFontObject("GameFontNormalLeft")
+	button:SetHighlightFontObject("GameFontHighlightLeft")
 
 	return button
 end
 
 local function Panel_UpdateList(self)
-	local SML = LibStub('LibSharedMedia-3.0')
-	local textures = LibStub('LibSharedMedia-3.0'):List('statusbar')
+	local SML = LibStub("LibSharedMedia-3.0")
+	local textures = LibStub("LibSharedMedia-3.0"):List("statusbar")
 	local currentTexture = DXP.frame.sets.texture
 
 	local scroll = self.scroll
 	FauxScrollFrame_Update(scroll, #textures, #self.buttons, height + offset)
 
-	for i,button in pairs(self.buttons) do
+	for i, button in pairs(self.buttons) do
 		local index = i + scroll.offset
 
 		if index <= #textures then
 			button:SetText(textures[index])
-			button.bg:SetTexture(SML:Fetch('statusbar', textures[index]))
+			button.bg:SetTexture(SML:Fetch("statusbar", textures[index]))
 			button:Show()
 		else
 			button:Hide()
@@ -401,16 +373,25 @@ end
 local function AddTexturePanel(menu)
 	local p = menu:NewPanel(L.Texture)
 	p.UpdateList = Panel_UpdateList
-	p:SetScript('OnShow', function() p:UpdateList() end)
-	p.textures = LibStub('LibSharedMedia-3.0'):List('statusbar')
+	p:SetScript("OnShow", function() p:UpdateList() end)
+	p.textures = LibStub("LibSharedMedia-3.0"):List("statusbar")
 
 	local name = p:GetName()
-	local scroll = CreateFrame('ScrollFrame', name .. 'ScrollFrame', p, 'FauxScrollFrameTemplate')
-	scroll:SetScript('OnVerticalScroll', function(self, arg1) FauxScrollFrame_OnVerticalScroll(self, arg1, height + offset, function() p:UpdateList() end) end)
-	scroll:SetScript('OnShow', function() p.buttons[1]:SetWidth(width) end)
-	scroll:SetScript('OnHide', function() p.buttons[1]:SetWidth(width + 20) end)
-	scroll:SetPoint('TOPLEFT', 8, 0)
-	scroll:SetPoint('BOTTOMRIGHT', -24, 2)
+	local scroll = CreateFrame("ScrollFrame", name .. "ScrollFrame", p, "FauxScrollFrameTemplate")
+	scroll:SetScript("OnVerticalScroll", function(self, arg1)
+		FauxScrollFrame_OnVerticalScroll(
+			self,
+			arg1,
+			height + offset,
+			function()
+				p:UpdateList()
+			end
+		)
+	end)
+	scroll:SetScript("OnShow", function() p.buttons[1]:SetWidth(width) end)
+	scroll:SetScript("OnHide", function() p.buttons[1]:SetWidth(width + 20) end)
+	scroll:SetPoint("TOPLEFT", 8, 0)
+	scroll:SetPoint("BOTTOMRIGHT", -24, 2)
 	p.scroll = scroll
 
 	--add list buttons
@@ -418,10 +399,10 @@ local function AddTexturePanel(menu)
 	for i = 1, NUM_ITEMS do
 		local b = TextureButton_Create(name .. i, p)
 		if i == 1 then
-			b:SetPoint('TOPLEFT', 4, 0)
+			b:SetPoint("TOPLEFT", 4, 0)
 		else
-			b:SetPoint('TOPLEFT', name .. i-1, 'BOTTOMLEFT', 0, -offset)
-			b:SetPoint('TOPRIGHT', name .. i-1, 'BOTTOMRIGHT', 0, -offset)
+			b:SetPoint("TOPLEFT", name .. i - 1, "BOTTOMLEFT", 0, -offset)
+			b:SetPoint("TOPRIGHT", name .. i - 1, "BOTTOMRIGHT", 0, -offset)
 		end
 		p.buttons[i] = b
 	end
@@ -429,9 +410,7 @@ local function AddTexturePanel(menu)
 	p.height = 200
 end
 
-
 --[[ Menu Code ]]--
-
 function XP:CreateMenu()
 	local menu = Dominos:NewMenu(self.id)
 	AddLayoutPanel(menu)

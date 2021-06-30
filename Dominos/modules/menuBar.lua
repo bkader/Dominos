@@ -112,11 +112,11 @@ function MenuBar:Layout()
 		local w = b:GetWidth() + spacing - WIDTH_OFFSET
 		local h = b:GetHeight() + spacing - HEIGHT_OFFSET
 
-		for i,b in pairs(self.buttons) do
+		for i, btn in pairs(self.buttons) do
 			local col = (i-1) % cols
 			local row = ceil(i / cols) - 1
-			b:ClearAllPoints()
-			b:SetPoint('TOPLEFT', w*col + pW, -(h*row + pH) + HEIGHT_OFFSET)
+			btn:ClearAllPoints()
+			btn:SetPoint('TOPLEFT', w*col + pW, -(h*row + pH) + HEIGHT_OFFSET)
 		end
 
 		self:SetWidth(max(w*cols - spacing + pW*2 + WIDTH_OFFSET, 8))

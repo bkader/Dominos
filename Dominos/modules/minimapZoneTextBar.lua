@@ -1,17 +1,16 @@
 assert(Dominos, "Dominos not found!")
 local Dominos = Dominos
-local L
 
-local zoneText = CreateFrame("Frame", "ZoneText", ZoneTextBar)
-MinimapZoneTextButton:SetParent(ZoneText)
+local zoneText = CreateFrame("Frame", "ZoneText", UIParent)
+MinimapZoneTextButton:SetParent(zoneText)
 
 local menuButtons = {}
 do
     local loadButtons = function(...)
-    	for i = 1, select("#", ...) do
+        for i = 1, select("#", ...) do
             local btn = select(i, ...)
             if btn and btn.GetName then
-            	tinsert(menuButtons, btn)
+                tinsert(menuButtons, btn)
             end
         end
     end
@@ -22,12 +21,19 @@ local mod = Dominos:NewModule("Zone-Text")
 local class = Dominos:CreateClass("Frame", Dominos.Frame)
 
 function mod:Load()
+	if not Dominos:UseMinimap() then
+		if self.frame then self:Unload() end
+		MinimapZoneTextButton:SetParent(MinimapCluster)
+		return
+	end
     self.frame = class:New()
     self.frame:SetFrameStrata("LOW")
 end
 
 function mod:Unload()
-    self.frame:Free()
+    if self.frame then
+		self.frame:Free()
+    end
 end
 
 function class:New()
@@ -50,7 +56,9 @@ end
 
 function class:AddButton(i)
     local btn = menuButtons[i]
-    if not btn then return end
+    if not btn then
+        return
+    end
     btn:SetParent(self.header)
     btn:Show()
     self.buttons[i] = btn
@@ -58,7 +66,9 @@ end
 
 function class:RemoveButton(i)
     local btn = self.buttons[i]
-    if not btn then return end
+    if not btn then
+        return
+    end
     btn:SetParent(nil)
     btn:Hide()
     self.buttons[i] = nil
@@ -73,7 +83,7 @@ local function AddLayoutPanel(menu)
 end
 
 local function AddShowState(self)
-	local L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
+    local L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
     local p = self:NewPanel(L.ShowStates)
     p.height = 56
 
@@ -83,7 +93,7 @@ local function AddShowState(self)
     editBox:SetPoint("TOPLEFT", 12, -10)
     editBox:SetAutoFocus(false)
     editBox:SetScript("OnShow", function(self)
-    	self:SetText(self:GetParent().owner:GetShowStates() or "")
+        self:SetText(self:GetParent().owner:GetShowStates() or "")
     end)
     editBox:SetScript("OnEnterPressed", function(self)
         local text = self:GetText()
@@ -97,7 +107,7 @@ local function AddShowState(self)
     set:SetHeight(20)
     set:SetText(L.Set)
     set:SetScript("OnClick", function(self)
-            local text = editBox:GetText()
+        local text = editBox:GetText()
         self:GetParent().owner:SetShowStates(text ~= "" and text or nil)
         editBox:SetText(self:GetParent().owner:GetShowStates() or "")
     end)

@@ -2,7 +2,7 @@ assert(Dominos, "Dominos not found!")
 local Dominos = Dominos
 
 --libs and omgspeed
-local _G = getfenv(0)
+local _G = _G
 local ceil = math.ceil
 local min = math.min
 local format = string.format
@@ -428,8 +428,8 @@ function ActionBar:UpdateActions()
 	local maxSize = self:MaxLength()
 
 	for state,condition in ipairs(self.conditions) do
-		local page = self:GetPage(condition)
-		for i,b in pairs(self.buttons) do
+		-- local page = self:GetPage(condition)
+		for i, b in pairs(self.buttons) do
 			local page = self:GetPage(condition)
 			local id = page and ToValidID(i + (self.id + page - 1)*maxSize) or nil
 
