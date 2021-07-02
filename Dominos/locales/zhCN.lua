@@ -58,3 +58,5 @@ L.Width = "宽"
 L.Height = "高"
 L.AlwaysShowText = "总显示文本"
 L.AlwaysShowXP = "总显示经验条"
+--cast bar
+L.ShowTime = "显示时间"

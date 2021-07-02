@@ -6,6 +6,12 @@ local DebuffsFrame = Dominos:CreateClass("Frame", Dominos.Frame)
 local L
 local LBF = LibStub("LibButtonFacade", true)
 
+function DebuffModule:OnInitialize()
+	if not Dominos:UseAuras() then
+		self:Disable()
+	end
+end
+
 function DebuffModule:Load()
 	if not Dominos:UseAuras() then
 		self:Unload()

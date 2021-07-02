@@ -1,8 +1,9 @@
 assert(Dominos, "Dominos not found!")
 local Dominos = Dominos
 
+local mod = Dominos:NewModule("Zone-Text")
+local class = Dominos:CreateClass("Frame", Dominos.Frame)
 local zoneText = CreateFrame("Frame", "ZoneText", UIParent)
-MinimapZoneTextButton:SetParent(zoneText)
 
 local menuButtons = {}
 do
@@ -14,18 +15,18 @@ do
             end
         end
     end
-    loadButtons(zoneText:GetChildren())
+
+	function mod:OnInitialize()
+		if Dominos:UseMinimap() then
+			MinimapZoneTextButton:SetParent(zoneText)
+    		loadButtons(zoneText:GetChildren())
+		else
+			self:Disable()
+		end
+	end
 end
 
-local mod = Dominos:NewModule("Zone-Text")
-local class = Dominos:CreateClass("Frame", Dominos.Frame)
-
 function mod:Load()
-	if not Dominos:UseMinimap() then
-		if self.frame then self:Unload() end
-		MinimapZoneTextButton:SetParent(MinimapCluster)
-		return
-	end
     self.frame = class:New()
     self.frame:SetFrameStrata("LOW")
 end

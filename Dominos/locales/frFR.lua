@@ -68,3 +68,5 @@ L.Width = "Largeur"
 L.Height = "Hauteur"
 L.AlwaysShowText = "Toujours afficher le texte"
 L.AlwaysShowXP = "Toujours afficher l'XP"
+--cast bar
+L.ShowTime = "Montrer le temps"

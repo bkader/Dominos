@@ -63,3 +63,5 @@ L.QuestLClick1 = "Left-click to expand the objectives tracker."
 L.QuestLClick2 = "Left-click to minimize the objectives tracker."
 L.QuestRClick = "Right-click to toggle the quest log."
 L.QuestSClick = "Shift-click to toggle the achievements window."
+-- cast bar
+L.ShowTime = "Show Time"

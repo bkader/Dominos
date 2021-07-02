@@ -1,8 +1,7 @@
 --[[
-	castBar.lua
-		A dominos based casting bar
+castBar.lua
+A dominos based casting bar
 --]]
-
 --[[
 	Copyright (c) 2008-2009 Jason Greer
 	All rights reserved.
@@ -31,38 +30,39 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 --]]
-
-local L = LibStub('AceLocale-3.0'):GetLocale('Dominos')
 local Dominos = Dominos
-local DCB = Dominos:NewModule('CastingBar')
+local L = LibStub("AceLocale-3.0"):GetLocale("Dominos")
+local DCB = Dominos:NewModule("CastingBar")
 local CastBar, CastingBar
 
-function DCB:Load()
-  if not Dominos:UseCastbar() then
-    if self.frame then self:Unload() end
-    return
-  end
-	self.frame = CastBar:New()
+function DCB:OnInitialize()
+	if Dominos:UseCastbar() then
+		CastingBarFrame:UnregisterAllEvents()
+		CastingBarFrame:Hide()
+	else
+		self:Disable()
+	end
+end
 
-  -- Hide Default Blizzard Cast bar:
-  CastingBarFrame:UnregisterAllEvents()
-  CastingBarFrame:Hide()
+function DCB:Load()
+	self.frame = CastBar:New()
+	-- Hide Default Blizzard Cast bar:
+	CastingBarFrame:UnregisterAllEvents()
+	CastingBarFrame:Hide()
 end
 
 function DCB:Unload()
-  if self.frame then
-    self.frame:Free()
-  end
+	if self.frame then
+		self.frame:Free()
+	end
 end
 
-
 --[[ Dominos Frame Object ]]--
-
-CastBar = Dominos:CreateClass('Frame', Dominos.Frame)
+CastBar = Dominos:CreateClass("Frame", Dominos.Frame)
 
 function CastBar:New()
-	local f = self.super.New(self, 'cast')
-	f:SetFrameStrata('HIGH')
+	local f = self.super.New(self, "cast")
+	f:SetFrameStrata("HIGH")
 
 	if not f.cast then
 		f.cast = CastingBar:New(f)
@@ -80,10 +80,10 @@ end
 
 function CastBar:GetDefaults()
 	return {
-		point = 'CENTER',
+		point = "CENTER",
 		x = 0,
 		y = 30,
-		showText = true,
+		showText = true
 	}
 end
 
@@ -103,11 +103,11 @@ end
 
 function CastBar:CreateMenu()
 	local menu = Dominos:NewMenu(self.id)
-	local panel = menu:NewPanel(LibStub('AceLocale-3.0'):GetLocale('Dominos-Config').Layout)
+	local panel = menu:NewPanel(LibStub("AceLocale-3.0"):GetLocale("Dominos-Config").Layout)
 
 	local time = panel:NewCheckButton(L.ShowTime)
-	time:SetScript('OnClick', function(b) self:ToggleText(b:GetChecked()) end)
-	time:SetScript('OnShow', function(b) b:SetChecked(self.sets.showText) end)
+	time:SetScript("OnClick", function(b) self:ToggleText(b:GetChecked()) end)
+	time:SetScript("OnShow", function(b) b:SetChecked(self.sets.showText) end)
 
 	panel:NewOpacitySlider()
 	panel:NewFadeSlider()
@@ -118,33 +118,31 @@ function CastBar:CreateMenu()
 end
 
 function CastBar:Layout()
-	self:SetWidth(max(self.cast:GetWidth() + 4 + self:GetPadding()*2, 8))
-	self:SetHeight(max(24 + self:GetPadding()*2, 8))
+	self:SetWidth(max(self.cast:GetWidth() + 4 + self:GetPadding() * 2, 8))
+	self:SetHeight(max(24 + self:GetPadding() * 2, 8))
 end
 
-
 --[[ CastingBar Object ]]--
-
-CastingBar = Dominos:CreateClass('StatusBar')
+CastingBar = Dominos:CreateClass("StatusBar")
 
 --omg speed
-local BORDER_SCALE = 197/150 --its magic!
+local BORDER_SCALE = 197 / 150 --its magic!
 local TEXT_PADDING = 18
 
 function CastingBar:New(parent)
-	local f = self:Bind(CreateFrame('StatusBar', 'DominosCastingBar', parent, 'DominosCastingBarTemplate'))
-	f:SetPoint('CENTER')
+	local f = self:Bind(CreateFrame("StatusBar", "DominosCastingBar", parent, "DominosCastingBarTemplate"))
+	f:SetPoint("CENTER")
 
 	local name = f:GetName()
 	local _G = _G
-	f.time = _G[name .. 'Time']
-	f.text = _G[name .. 'Text']
-	f.borderTexture = _G[name .. 'Border']
-	f.flashTexture = _G[name .. 'Flash']
+	f.time = _G[name .. "Time"]
+	f.text = _G[name .. "Text"]
+	f.borderTexture = _G[name .. "Border"]
+	f.flashTexture = _G[name .. "Flash"]
 
 	f.normalWidth = f:GetWidth()
-	f:SetScript('OnUpdate', f.OnUpdate)
-	f:SetScript('OnEvent', f.OnEvent)
+	f:SetScript("OnUpdate", f.OnUpdate)
+	f:SetScript("OnEvent", f.OnEvent)
 
 	return f
 end
@@ -154,9 +152,9 @@ function CastingBar:OnEvent(event, ...)
 
 	local unit, spell = ...
 	if unit == self.unit then
-		if event == 'UNIT_SPELLCAST_FAILED' or event == 'UNIT_SPELLCAST_INTERRUPTED' then
+		if event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
 			self.failed = true
-		elseif event == 'UNIT_SPELLCAST_START' or event == 'UNIT_SPELLCAST_CHANNEL_START' then
+		elseif event == "UNIT_SPELLCAST_START" or event == "UNIT_SPELLCAST_CHANNEL_START" then
 			self.failed = nil
 		end
 		self:UpdateColor(spell)
@@ -167,10 +165,10 @@ function CastingBar:OnUpdate(elapsed)
 	CastingBarFrame_OnUpdate(self, elapsed)
 
 	if self.casting then
-		self.time:SetFormattedText('%.1f', self.maxValue - self.value)
+		self.time:SetFormattedText("%.1f", self.maxValue - self.value)
 		self:AdjustWidth()
 	elseif self.channeling then
-		self.time:SetFormattedText('%.1f', self.value)
+		self.time:SetFormattedText("%.1f", self.value)
 		self:AdjustWidth()
 	end
 end
@@ -208,7 +206,3 @@ function CastingBar:UpdateColor(spell)
 		self:SetStatusBarColor(1, 0.7, 0)
 	end
 end
-
---hide the old casting bar
--- CastingBarFrame:UnregisterAllEvents()
--- CastingBarFrame:Hide()

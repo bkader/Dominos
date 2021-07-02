@@ -6,13 +6,15 @@ local BuffsFrame = Dominos:CreateClass("Frame", Dominos.Frame)
 local L
 local LBF = LibStub("LibButtonFacade", true)
 
-function BuffsModule:Load()
-	if not Dominos:UseAuras() then
-		self:Unload()
-		return
+function BuffsModule:OnInitialize()
+	if Dominos:UseAuras() then
+		BuffFrame:Hide()
+	else
+		self:Disable()
 	end
+end
 
-	BuffFrame:Hide()
+function BuffsModule:Load()
     self.frame = BuffsFrame:New()
 end
 

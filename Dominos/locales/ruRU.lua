@@ -54,3 +54,5 @@ L.Width = "Ширина"
 L.Height = "Высота"
 L.AlwaysShowText = "Всегда показывать текст"
 L.AlwaysShowXP = "Всегда показывать опыт"
+--cast bar
+L.ShowTime = "Показать время"
