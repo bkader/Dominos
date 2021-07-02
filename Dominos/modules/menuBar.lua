@@ -15,50 +15,47 @@ local menuButtons = {
 	HelpMicroButton
 }
 --]]
-
 local menuButtons
 do
 	local loadButtons = function(...)
 		menuButtons = {}
 
-		for i = 1, select('#', ...) do
+		for i = 1, select("#", ...) do
 			local b = select(i, ...)
 			local name = b:GetName()
-			if name and name:match('(%w+)MicroButton$') then
+			if name and name:match("(%w+)MicroButton$") then
 				table.insert(menuButtons, b)
 			end
 		end
 	end
-	loadButtons(_G['MainMenuBarArtFrame']:GetChildren())
+	loadButtons(_G["MainMenuBarArtFrame"]:GetChildren())
 end
 
 do
-	TalentMicroButton:SetScript('OnEvent', function(self, event)
-		if (event == 'PLAYER_LEVEL_UP' or event == 'PLAYER_LOGIN') then
-			if UnitCharacterPoints('player') > 0 and not CharacterFrame:IsShown() then
+	TalentMicroButton:SetScript("OnEvent", function(self, event)
+		if (event == "PLAYER_LEVEL_UP" or event == "PLAYER_LOGIN") then
+			if UnitCharacterPoints("player") > 0 and not CharacterFrame:IsShown() then
 				SetButtonPulse(self, 60, 1)
 			end
-		elseif event == 'UPDATE_BINDINGS' then
-			self.tooltipText =  MicroButtonTooltipText(TALENTS_BUTTON, 'TOGGLETALENTS')
+		elseif event == "UPDATE_BINDINGS" then
+			self.tooltipText = MicroButtonTooltipText(TALENTS_BUTTON, "TOGGLETALENTS")
 		end
 	end)
 	TalentMicroButton:UnregisterAllEvents()
-	TalentMicroButton:RegisterEvent('PLAYER_LEVEL_UP')
-	TalentMicroButton:RegisterEvent('PLAYER_LOGIN')
-	TalentMicroButton:RegisterEvent('UPDATE_BINDINGS')
+	TalentMicroButton:RegisterEvent("PLAYER_LEVEL_UP")
+	TalentMicroButton:RegisterEvent("PLAYER_LOGIN")
+	TalentMicroButton:RegisterEvent("UPDATE_BINDINGS")
 
 	--simialr thing, but the achievement button
 	AchievementMicroButton:UnregisterAllEvents()
 end
 
-
---[[ Menu Bar ]]--
-
-local MenuBar = Dominos:CreateClass('Frame', Dominos.Frame)
-Dominos.MenuBar  = MenuBar
+--[[ Menu Bar ]]
+local MenuBar = Dominos:CreateClass("Frame", Dominos.Frame)
+Dominos.MenuBar = MenuBar
 
 function MenuBar:New()
-	local f = self.super.New(self, 'menu')
+	local f = self.super.New(self, "menu")
 	f:LoadButtons()
 	f:Layout()
 
@@ -66,11 +63,7 @@ function MenuBar:New()
 end
 
 function MenuBar:GetDefaults()
-	return {
-		point = 'BOTTOMRIGHT',
-		x = -244,
-		y = 0,
-	}
+	return {point = "BOTTOMRIGHT", x = -244, y = 0}
 end
 
 function MenuBar:NumButtons()
@@ -113,15 +106,16 @@ function MenuBar:Layout()
 		local h = b:GetHeight() + spacing - HEIGHT_OFFSET
 
 		for i, btn in pairs(self.buttons) do
-			local col = (i-1) % cols
+			local col = (i - 1) % cols
 			local row = ceil(i / cols) - 1
 			btn:ClearAllPoints()
-			btn:SetPoint('TOPLEFT', w*col + pW, -(h*row + pH) + HEIGHT_OFFSET)
+			btn:SetPoint("TOPLEFT", w * col + pW, -(h * row + pH) + HEIGHT_OFFSET)
 		end
 
-		self:SetWidth(max(w*cols - spacing + pW*2 + WIDTH_OFFSET, 8))
-		self:SetHeight(max(h*ceil(#self.buttons/cols) - spacing + pH*2, 8))
+		self:SetWidth(max(w * cols - spacing + pW * 2 + WIDTH_OFFSET, 8))
+		self:SetHeight(max(h * ceil(#self.buttons / cols) - spacing + pH * 2, 8))
 	else
-		self:SetWidth(30); self:SetHeight(30)
+		self:SetWidth(30)
+		self:SetHeight(30)
 	end
 end

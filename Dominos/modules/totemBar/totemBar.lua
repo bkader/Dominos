@@ -1,15 +1,16 @@
-﻿--[[
-	totemBar
-		A dominos totem bar
+--[[
+totemBar
+A dominos totem bar
 --]]
-
 --no reason to load if we're not playing a shaman...
-local class, enClass = UnitClass('player')
-if enClass ~= 'SHAMAN' then
+assert(Dominos, "Dominos not found!")
+
+if select(2, UnitClass("player")) ~= "SHAMAN" then
 	return
 end
 
-local DTB = Dominos:NewModule('totems', 'AceEvent-3.0')
+local Dominos = Dominos
+local DTB = Dominos:NewModule("totems", "AceEvent-3.0")
 local TotemBar
 
 --hurray for constants
@@ -18,37 +19,35 @@ local RECALL_SPELL = TOTEM_MULTI_CAST_RECALL_SPELLS[1]
 local START_ACTION_ID = 132 --actionID start of the totembar
 local SUMMON_SPELLS = TOTEM_MULTI_CAST_SUMMON_SPELLS
 
---[[ Module ]]--
-
+--[[ Module ]]
 function DTB:Load()
 	self:LoadTotemBars()
-
-	self:RegisterEvent('UPDATE_MULTI_CAST_ACTIONBAR')
+	self:RegisterEvent("UPDATE_MULTI_CAST_ACTIONBAR")
 end
 
 function DTB:Unload()
 	self:FreeTotemBars()
 
-	self:UnregisterEvent('PLAYER_REGEN_ENABLED')
-	self:UnregisterEvent('UPDATE_MULTI_CAST_ACTIONBAR')
+	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+	self:UnregisterEvent("UPDATE_MULTI_CAST_ACTIONBAR")
 end
 
 function DTB:UPDATE_MULTI_CAST_ACTIONBAR()
 	if not InCombatLockdown() then
 		self:LoadTotemBars()
 	else
-		self:RegisterEvent('PLAYER_REGEN_ENABLED')
+		self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	end
 end
 
 function DTB:PLAYER_REGEN_ENABLED()
 	self:LoadTotemBars()
-	self:UnregisterEvent('PLAYER_REGEN_ENABLED')
+	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 end
 
 function DTB:LoadTotemBars()
 	for i, spell in pairs(SUMMON_SPELLS) do
-		local f = Dominos.Frame:Get('totem' .. i)
+		local f = Dominos.Frame:Get("totem" .. i)
 		if f then
 			f:LoadButtons()
 		else
@@ -59,20 +58,18 @@ end
 
 function DTB:FreeTotemBars()
 	for i, _ in pairs(SUMMON_SPELLS) do
-		local f = Dominos.Frame:Get('totem' .. i)
+		local f = Dominos.Frame:Get("totem" .. i)
 		if f then
 			f:Free()
 		end
 	end
 end
 
-
---[[ Totem Bar ]]--
-
-TotemBar = Dominos:CreateClass('Frame', Dominos.Frame)
+--[[ Totem Bar ]]
+TotemBar = Dominos:CreateClass("Frame", Dominos.Frame)
 
 function TotemBar:New(id, spell)
-	local f = self.super.New(self, 'totem' .. id)
+	local f = self.super.New(self, "totem" .. id)
 	f.totemBarID = id
 	f.callSpell = spell
 	f:LoadButtons()
@@ -83,7 +80,7 @@ end
 
 function TotemBar:GetDefaults()
 	return {
-		point = 'CENTER',
+		point = "CENTER",
 		spacing = 2,
 		showRecall = true,
 		showTotems = true
@@ -134,9 +131,7 @@ function TotemBar:ShowingTotems()
 	return self.sets.showTotems
 end
 
-
---[[ button stuff]]--
-
+--[[ button stuff]]
 local tinsert = table.insert
 
 function TotemBar:LoadButtons()
@@ -176,7 +171,6 @@ function TotemBar:GetCallButton()
 	return self:CreateSpellButton(self.callSpell)
 end
 
-
 function TotemBar:IsRecallKnown()
 	return IsSpellKnown(RECALL_SPELL, false)
 end
@@ -184,7 +178,6 @@ end
 function TotemBar:GetRecallButton()
 	return self:CreateSpellButton(RECALL_SPELL)
 end
-
 
 function TotemBar:GetTotemButton(id)
 	return self:CreateActionButton(self:GetBaseID() + id)
@@ -203,36 +196,26 @@ function TotemBar:CreateActionButton(actionID)
 	return b
 end
 
-
---[[ right click menu ]]--
-
+--[[ right click menu ]]
 function TotemBar:AddLayoutPanel(menu)
-	local L = LibStub('AceLocale-3.0'):GetLocale('Dominos-Config', 'enUS')
+	local L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config", "enUS")
 	local panel = menu:AddLayoutPanel()
 
 	--add show totemic recall toggle
 	local showRecall = panel:NewCheckButton(L.ShowTotemRecall)
-
-	showRecall:SetScript('OnClick', function(b)
-		self:SetShowRecall(b:GetChecked());
+	showRecall:SetScript("OnClick", function(b)
+		self:SetShowRecall(b:GetChecked())
 		panel.colsSlider:OnShow() --force update the columns slider
 	end)
-
-	showRecall:SetScript('OnShow', function(b)
-		b:SetChecked(self:ShowingRecall())
-	end)
+	showRecall:SetScript("OnShow", function(b) b:SetChecked(self:ShowingRecall()) end)
 
 	--add show totems toggle
 	local showTotems = panel:NewCheckButton(L.ShowTotems)
-
-	showTotems:SetScript('OnClick', function(b)
-		self:SetShowTotems(b:GetChecked());
+	showTotems:SetScript("OnClick", function(b)
+		self:SetShowTotems(b:GetChecked())
 		panel.colsSlider:OnShow()
 	end)
-
-	showTotems:SetScript('OnShow', function(b)
-		b:SetChecked(self:ShowingTotems())
-	end)
+	showTotems:SetScript("OnShow", function(b) b:SetChecked(self:ShowingTotems()) end)
 end
 
 function TotemBar:CreateMenu()

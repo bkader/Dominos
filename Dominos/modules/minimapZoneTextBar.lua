@@ -19,7 +19,7 @@ do
 	function mod:OnInitialize()
 		if Dominos:UseMinimap() then
 			MinimapZoneTextButton:SetParent(zoneText)
-    		loadButtons(zoneText:GetChildren())
+			loadButtons(zoneText:GetChildren())
 		else
 			self:Disable()
 		end

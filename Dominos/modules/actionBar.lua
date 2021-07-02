@@ -8,13 +8,11 @@ local min = math.min
 local format = string.format
 local MAX_BUTTONS = 120
 local NUM_POSSESS_BAR_BUTTONS = 12
-local KeyBound = LibStub('LibKeyBound-1.0')
-local LBF = LibStub('LibButtonFacade', true)
-
+local KeyBound = LibStub("LibKeyBound-1.0")
+local LBF = LibStub("LibButtonFacade", true)
 
 --[[ Action Button ]]--
-
-local ActionButton = Dominos:CreateClass('CheckButton', Dominos.BindableButton)
+local ActionButton = Dominos:CreateClass("CheckButton", Dominos.BindableButton)
 Dominos.ActionButton = ActionButton
 ActionButton.unused = {}
 ActionButton.active = {}
@@ -23,9 +21,9 @@ ActionButton.active = {}
 function ActionButton:New(id)
 	local b = self:Restore(id) or self:Create(id)
 	if b then
-		b:SetAttribute('showgrid', 0)
-		b:SetAttribute('action--base', id)
-		b:SetAttribute('_childupdate-action', [[
+		b:SetAttribute("showgrid", 0)
+		b:SetAttribute("action--base", id)
+		b:SetAttribute("_childupdate-action", [[
 			local id = message and self:GetAttribute('action--' .. message) or self:GetAttribute('action--base')
 			self:SetAttribute('action', id)
 		]])
@@ -35,9 +33,9 @@ function ActionButton:New(id)
 		b:UpdateMacro()
 
 		--hack #1billion, get rid of range indicator text
-		local hotkey = _G[b:GetName() .. 'HotKey']
-		if hotkey:GetText() == _G['RANGE_INDICATOR'] then
-			hotkey:SetText('')
+		local hotkey = _G[b:GetName() .. "HotKey"]
+		if hotkey:GetText() == _G["RANGE_INDICATOR"] then
+			hotkey:SetText("")
 		end
 
 		self.active[id] = b
@@ -48,25 +46,25 @@ end
 
 local function Create(id)
 	if id <= 12 then
-		local b = _G['ActionButton' .. id]
-		b.buttonType = 'ACTIONBUTTON'
+		local b = _G["ActionButton" .. id]
+		b.buttonType = "ACTIONBUTTON"
 		return b
 	elseif id <= 24 then
-		local b = _G['BonusActionButton' .. (id - 12)]
-		b:UnregisterEvent('UPDATE_BONUS_ACTIONBAR')
+		local b = _G["BonusActionButton" .. (id - 12)]
+		b:UnregisterEvent("UPDATE_BONUS_ACTIONBAR")
 		b.isBonus = nil
 		b.buttonType = nil --this is done because blizzard displays action bar 1 bindings on the bonus bar, which is incorrect in the case of Dominos
 		return b
 	elseif id <= 36 then
-		return _G['MultiBarRightButton' .. (id-24)]
+		return _G["MultiBarRightButton" .. (id - 24)]
 	elseif id <= 48 then
-		return _G['MultiBarLeftButton' .. (id-36)]
+		return _G["MultiBarLeftButton" .. (id - 36)]
 	elseif id <= 60 then
-		return _G['MultiBarBottomRightButton' .. (id-48)]
+		return _G["MultiBarBottomRightButton" .. (id - 48)]
 	elseif id <= 72 then
-		return _G['MultiBarBottomLeftButton' .. (id-60)]
+		return _G["MultiBarBottomLeftButton" .. (id - 60)]
 	end
-	return CreateFrame('CheckButton', 'DominosActionButton' .. (id-72), nil, 'ActionBarButtonTemplate')
+	return CreateFrame("CheckButton", "DominosActionButton" .. (id - 72), nil, "ActionBarButtonTemplate")
 end
 
 function ActionButton:Create(id)
@@ -77,14 +75,14 @@ function ActionButton:Create(id)
 		--this is used to preserve the button's old id
 		--we cannot simply keep a button's id at > 0 or blizzard code will take control of paging
 		--but we need the button's id for the old bindings system
-		b:SetAttribute('bindingid', b:GetID())
+		b:SetAttribute("bindingid", b:GetID())
 		b:SetID(0)
 
 		b:ClearAllPoints()
-		b:SetAttribute('useparent-actionpage', nil)
-		b:SetAttribute('useparent-unit', true)
+		b:SetAttribute("useparent-actionpage", nil)
+		b:SetAttribute("useparent-unit", true)
 		b:EnableMouseWheel(true)
-		b:SetScript('OnEnter', self.OnEnter)
+		b:SetScript("OnEnter", self.OnEnter)
 		b:Skin()
 	end
 	return b
@@ -104,7 +102,7 @@ end
 
 --destructor
 function ActionButton:Free()
-	local id = self:GetAttribute('action--base')
+	local id = self:GetAttribute("action--base")
 
 	self.active[id] = nil
 
@@ -119,12 +117,12 @@ end
 
 --these are all events that are registered OnLoad for action buttons
 function ActionButton:LoadEvents()
-	self:RegisterEvent('PLAYER_ENTERING_WORLD')
-	self:RegisterEvent('ACTIONBAR_SHOWGRID')
-	self:RegisterEvent('ACTIONBAR_HIDEGRID')
-	self:RegisterEvent('ACTIONBAR_PAGE_CHANGED')
-	self:RegisterEvent('ACTIONBAR_SLOT_CHANGED')
-	self:RegisterEvent('UPDATE_BINDINGS')
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("ACTIONBAR_SHOWGRID")
+	self:RegisterEvent("ACTIONBAR_HIDEGRID")
+	self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
+	self:RegisterEvent("UPDATE_BINDINGS")
 end
 
 --keybound support
@@ -136,36 +134,40 @@ function ActionButton:OnEnter()
 end
 
 --override the old update hotkeys function
-hooksecurefunc('ActionButton_UpdateHotkeys', ActionButton.UpdateHotkey)
+hooksecurefunc("ActionButton_UpdateHotkeys", ActionButton.UpdateHotkey)
 
 -- Color button red if out of range
-hooksecurefunc('ActionButton_OnEvent',function(self, event, ...)
-  if event == 'PLAYER_TARGET_CHANGED' then
-    self.newTimer = self.rangeTimer
-  end
+hooksecurefunc("ActionButton_OnEvent", function(self, event, ...)
+	if event == "PLAYER_TARGET_CHANGED" then
+		self.newTimer = self.rangeTimer
+	end
 end)
-hooksecurefunc('ActionButton_UpdateUsable',function(self)
-  local icon = _G[self:GetName()..'Icon']
-  local valid = IsActionInRange(self.action)
-  if valid == 0 then
-    icon:SetVertexColor(1.0, 0.1, 0.1)
-  end
+hooksecurefunc("ActionButton_UpdateUsable", function(self)
+	local icon = _G[self:GetName() .. "Icon"]
+	local valid = IsActionInRange(self.action)
+	if valid == 0 then
+		icon:SetVertexColor(1.0, 0.1, 0.1)
+	elseif not IsUsableAction(self.action) then
+		icon:SetVertexColor(0.5, 0.5, 1.0)
+	else
+		icon:SetVertexColor(1.0, 1.0, 1.0)
+	end
 end)
-hooksecurefunc('ActionButton_OnUpdate', function(self, elapsed)
-  local rangeTimer = self.newTimer
-  if rangeTimer then
-    rangeTimer = rangeTimer - elapsed
-    if rangeTimer <= 0 then
-      ActionButton_UpdateUsable(self)
-      rangeTimer = TOOLTIP_UPDATE_TIME
-    end
-    self.newTimer = rangeTimer
-  end
+hooksecurefunc("ActionButton_OnUpdate", function(self, elapsed)
+	local rangeTimer = self.newTimer
+	if rangeTimer then
+		rangeTimer = rangeTimer - elapsed
+		if rangeTimer <= 0 then
+			ActionButton_UpdateUsable(self)
+			rangeTimer = TOOLTIP_UPDATE_TIME
+		end
+		self.newTimer = rangeTimer
+	end
 end)
 
 --button visibility
 function ActionButton:UpdateGrid()
-	if self:GetAttribute('showgrid') > 0 then
+	if self:GetAttribute("showgrid") > 0 then
 		ActionButton_ShowGrid(self)
 	else
 		ActionButton_HideGrid(self)
@@ -175,79 +177,74 @@ end
 --macro text
 function ActionButton:UpdateMacro()
 	if Dominos:ShowMacroText() then
-		_G[self:GetName() .. 'Name']:Show()
+		_G[self:GetName() .. "Name"]:Show()
 	else
-		_G[self:GetName() .. 'Name']:Hide()
+		_G[self:GetName() .. "Name"]:Hide()
 	end
 end
 
 --utility function, resyncs the button's current action, modified by state
 function ActionButton:LoadAction()
-	local state = self:GetParent():GetAttribute('state-page')
-	local id = state and self:GetAttribute('action--' .. state) or self:GetAttribute('action--base')
-	self:SetAttribute('action', id)
+	local state = self:GetParent():GetAttribute("state-page")
+	local id = state and self:GetAttribute("action--" .. state) or self:GetAttribute("action--base")
+	self:SetAttribute("action", id)
 end
 
 function ActionButton:Skin()
 	if LBF then
-		LBF:Group('Dominos', 'Action Bar'):AddButton(self)
+		LBF:Group("Dominos", "Action Bar"):AddButton(self)
 	else
-		_G[self:GetName() .. 'Icon']:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+		_G[self:GetName() .. "Icon"]:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 		self:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
 	end
 end
 
-
 --[[ Action Bar ]]--
-
-local ActionBar = Dominos:CreateClass('Frame', Dominos.Frame)
+local ActionBar = Dominos:CreateClass("Frame", Dominos.Frame)
 Dominos.ActionBar = ActionBar
 
-local POSSESSED_CONDITIONAL = '[bonusbar:5]'
-
+--metatable magic.
+-- Basically this says, 'create a new table for this index'
+--I do this so that I only create page tables for classes the user is actually playing
+local POSSESSED_CONDITIONAL = "[bonusbar:5]"
 
 --[[ Constructor Code ]]--
-
---metatable magic.  Basically this says, 'create a new table for this index'
---I do this so that I only create page tables for classes the user is actually playing
-ActionBar.defaultOffsets = {
-	__index = function(t, i)
-		t[i] = {}
-		return t[i]
-	end
-}
+ActionBar.defaultOffsets = {__index = function(t, i)
+	t[i] = {}
+	return t[i]
+end}
 
 --metatable magic.  Basically this says, 'create a new table for this index, with these defaults'
 --I do this so that I only create page tables for classes the user is actually playing
 ActionBar.mainbarOffsets = {
 	__index = function(t, i)
 		local pages = {
-			['[bar:2]'] = 1,
-			['[bar:3]'] = 2,
-			['[bar:4]'] = 3,
-			['[bar:5]'] = 4,
-			['[bar:6]'] = 5,
+			["[bar:2]"] = 1,
+			["[bar:3]"] = 2,
+			["[bar:4]"] = 3,
+			["[bar:5]"] = 4,
+			["[bar:6]"] = 5
 		}
 
-		if i == 'DRUID' then
---			pages['[bonusbar:1,stealth]'] = 5
-			pages['[bonusbar:1]'] = 6
-			pages['[bonusbar:2]'] = 7
-			pages['[bonusbar:3]'] = 8
-			pages['[bonusbar:4]'] = 9
-		elseif i == 'WARRIOR' then
-			pages['[bonusbar:1]'] = 6
-			pages['[bonusbar:2]'] = 7
-			pages['[bonusbar:3]'] = 8
-		elseif i == 'PRIEST' then
-			pages['[bonusbar:1]'] = 6
-		elseif i == 'ROGUE' then
-			pages['[bonusbar:1]'] = 6
-			pages['[form:3]'] = 6 --shadowdance
---[[
+		if i == "DRUID" then
+			--			pages['[bonusbar:1,stealth]'] = 5
+			pages["[bonusbar:1]"] = 6
+			pages["[bonusbar:2]"] = 7
+			pages["[bonusbar:3]"] = 8
+			pages["[bonusbar:4]"] = 9
+		elseif i == "WARRIOR" then
+			pages["[bonusbar:1]"] = 6
+			pages["[bonusbar:2]"] = 7
+			pages["[bonusbar:3]"] = 8
+		elseif i == "PRIEST" then
+			pages["[bonusbar:1]"] = 6
+		elseif i == "ROGUE" then
+			pages["[bonusbar:1]"] = 6
+			pages["[form:3]"] = 6 --shadowdance
+		--[[
 		elseif i == 'WARLOCK' then
 			pages['[form:2]'] = 6 --demon form, need to watch this to make sure blizzard doesn't change the page
---]]
+		--]]
 		end
 
 		t[i] = pages
@@ -257,33 +254,33 @@ ActionBar.mainbarOffsets = {
 
 --this is the set of conditions used for paging, in order of evaluation
 ActionBar.conditions = {
-	'[mod:SELFCAST]',
-	'[mod:alt,mod:ctrl,mod:shift]',
-	'[mod:alt,mod:ctrl]',
-	'[mod:alt,mod:shift]',
-	'[mod:ctrl,mod:shift]',
-	'[mod:alt]',
-	'[mod:ctrl]',
-	'[mod:shift]',
+	"[mod:SELFCAST]",
+	"[mod:alt,mod:ctrl,mod:shift]",
+	"[mod:alt,mod:ctrl]",
+	"[mod:alt,mod:shift]",
+	"[mod:ctrl,mod:shift]",
+	"[mod:alt]",
+	"[mod:ctrl]",
+	"[mod:shift]",
 	POSSESSED_CONDITIONAL,
-	'[bar:2]',
-	'[bar:3]',
-	'[bar:4]',
-	'[bar:5]',
-	'[bar:6]',
-	'[bonusbar:1,stealth]', --prowl
-	'[form:2]',
-	'[form:3]',
-	'[bonusbar:1]',
-	'[bonusbar:2]',
-	'[bonusbar:3]',
-	'[bonusbar:4]',
-	'[help]',
-	'[harm]',
-	'[noexists]'
+	"[bar:2]",
+	"[bar:3]",
+	"[bar:4]",
+	"[bar:5]",
+	"[bar:6]",
+	"[bonusbar:1,stealth]", --prowl
+	"[form:2]",
+	"[form:3]",
+	"[bonusbar:1]",
+	"[bonusbar:2]",
+	"[bonusbar:3]",
+	"[bonusbar:4]",
+	"[help]",
+	"[harm]",
+	"[noexists]"
 }
 
-ActionBar.class = select(2, UnitClass('player'))
+ActionBar.class = select(2, UnitClass("player"))
 local active = {}
 
 function ActionBar:New(id)
@@ -291,7 +288,7 @@ function ActionBar:New(id)
 	f.sets.pages = setmetatable(f.sets.pages, f.id == 1 and self.mainbarOffsets or self.defaultOffsets)
 
 	f.pages = f.sets.pages[f.class]
-	f.baseID = f:MaxLength() * (id-1)
+	f.baseID = f:MaxLength() * (id - 1)
 
 	f:LoadStateController()
 	f:LoadButtons()
@@ -308,9 +305,9 @@ end
 --TODO: change the position code to be based more on the number of action bars
 function ActionBar:GetDefaults()
 	local defaults = {}
-	defaults.point = 'BOTTOM'
+	defaults.point = "BOTTOM"
 	defaults.x = 0
-	defaults.y = 40*(self.id-1)
+	defaults.y = 40 * (self.id - 1)
 	defaults.pages = {}
 	defaults.spacing = 4
 	defaults.padW = 2
@@ -330,9 +327,7 @@ function ActionBar:MaxLength()
 	return floor(MAX_BUTTONS / Dominos:NumBars())
 end
 
-
 --[[ button stuff]]--
-
 function ActionBar:LoadButtons()
 	for i = 1, self:NumButtons() do
 		local b = ActionButton:New(self.baseID + i)
@@ -363,9 +358,7 @@ function ActionBar:RemoveButton(i)
 	b:Free()
 end
 
-
 --[[ Paging Code ]]--
-
 function ActionBar:SetPage(condition, page)
 	self.pages[condition] = page
 	self:UpdateStateDriver()
@@ -376,24 +369,25 @@ function ActionBar:GetPage(condition)
 end
 
 --note to self:
---if you leave a ; on the end of a statebutton string, it causes evaluation issues, especially if you're doing right click selfcast on the base state
+--if you leave a ; on the end of a statebutton string, it causes evaluation issues,
+-- especially if you're doing right click selfcast on the base state
 function ActionBar:UpdateStateDriver()
-	UnregisterStateDriver(self.header, 'page', 0)
+	UnregisterStateDriver(self.header, "page", 0)
 
-	local header = ''
-	for state,condition in ipairs(self.conditions) do
+	local header = ""
+	for state, condition in ipairs(self.conditions) do
 		--possess bar: special case
 		if condition == POSSESSED_CONDITIONAL then
 			if self:IsPossessBar() then
-				header = header .. condition .. 'possess;'
+				header = header .. condition .. "possess;"
 			end
 		elseif self:GetPage(condition) then
-			header = header .. condition .. 'S' .. state .. ';'
+			header = header .. condition .. "S" .. state .. ";"
 		end
 	end
 
-	if header ~= '' then
-		RegisterStateDriver(self.header, 'page', header .. 0)
+	if header ~= "" then
+		RegisterStateDriver(self.header, "page", header .. 0)
 	end
 
 	self:UpdateActions()
@@ -409,17 +403,17 @@ function ActionBar:UpdateAction(i)
 	local b = self.buttons[i]
 	local maxSize = self:MaxLength()
 
-	for state,condition in ipairs(self.conditions) do
+	for state, condition in ipairs(self.conditions) do
 		local page = self:GetPage(condition)
-		local id = page and ToValidID(b:GetAttribute('action--base') + (self.id + page - 1)*maxSize) or nil
+		local id = page and ToValidID(b:GetAttribute("action--base") + (self.id + page - 1) * maxSize) or nil
 
-		b:SetAttribute('action--S' .. state, id)
+		b:SetAttribute("action--S" .. state, id)
 	end
 
 	if self:IsPossessBar() and i <= NUM_POSSESS_BAR_BUTTONS then
-		b:SetAttribute('action--possess', MAX_BUTTONS + i)
+		b:SetAttribute("action--possess", MAX_BUTTONS + i)
 	else
-		b:SetAttribute('action--possess', nil)
+		b:SetAttribute("action--possess", nil)
 	end
 end
 
@@ -427,36 +421,36 @@ end
 function ActionBar:UpdateActions()
 	local maxSize = self:MaxLength()
 
-	for state,condition in ipairs(self.conditions) do
+	for state, condition in ipairs(self.conditions) do
 		-- local page = self:GetPage(condition)
 		for i, b in pairs(self.buttons) do
 			local page = self:GetPage(condition)
-			local id = page and ToValidID(i + (self.id + page - 1)*maxSize) or nil
+			local id = page and ToValidID(i + (self.id + page - 1) * maxSize) or nil
 
-			b:SetAttribute('action--S' .. state, id)
+			b:SetAttribute("action--S" .. state, id)
 		end
 	end
 
 	if self:IsPossessBar() then
 		for i = 1, min(#self.buttons, NUM_POSSESS_BAR_BUTTONS) do
-			self.buttons[i]:SetAttribute('action--possess', MAX_BUTTONS + i)
+			self.buttons[i]:SetAttribute("action--possess", MAX_BUTTONS + i)
 		end
 		for i = NUM_POSSESS_BAR_BUTTONS + 1, #self.buttons do
-			self.buttons[i]:SetAttribute('action--possess', nil)
+			self.buttons[i]:SetAttribute("action--possess", nil)
 		end
 	else
-		for _,b in pairs(self.buttons) do
-			b:SetAttribute('action--possess', nil)
+		for _, b in pairs(self.buttons) do
+			b:SetAttribute("action--possess", nil)
 		end
 	end
 end
 
 function ActionBar:LoadStateController()
-	self.header:SetAttribute('_onstate-page', [[ control:ChildUpdate('action', newstate) ]])
+	self.header:SetAttribute("_onstate-page", [[ control:ChildUpdate('action', newstate) ]])
 end
 
 function ActionBar:RefreshActions()
-	local state = self.header:GetAttribute('state-page')
+	local state = self.header:GetAttribute("state-page")
 	if state then
 		self.header:Execute(format([[ control:ChildUpdate('action', '%s') ]], state))
 	else
@@ -469,18 +463,17 @@ function ActionBar:IsPossessBar()
 	return self == Dominos:GetPossessBar()
 end
 
-
 --Empty button display
 function ActionBar:ShowGrid()
-	for _,b in pairs(self.buttons) do
-		b:SetAttribute('showgrid', b:GetAttribute('showgrid') + 1)
+	for _, b in pairs(self.buttons) do
+		b:SetAttribute("showgrid", b:GetAttribute("showgrid") + 1)
 		b:UpdateGrid()
 	end
 end
 
 function ActionBar:HideGrid()
-	for _,b in pairs(self.buttons) do
-		b:SetAttribute('showgrid', max(b:GetAttribute('showgrid') - 1, 0))
+	for _, b in pairs(self.buttons) do
+		b:SetAttribute("showgrid", max(b:GetAttribute("showgrid") - 1, 0))
 		b:UpdateGrid()
 	end
 end
@@ -502,19 +495,17 @@ function ActionBar:KEYBOUND_DISABLED()
 	self:HideGrid()
 end
 
-
 --right click targeting support
 function ActionBar:UpdateRightClickUnit()
-	self.header:SetAttribute('*unit2', Dominos:GetRightClickUnit())
+	self.header:SetAttribute("*unit2", Dominos:GetRightClickUnit())
 end
 
 --utility functions
 function ActionBar:ForAll(method, ...)
-	for _,f in pairs(active) do
+	for _, f in pairs(active) do
 		f[method](f, ...)
 	end
 end
-
 
 --right click menu code for action bars
 --TODO: Probably enable the showstate stuff for other bars, since every bar basically has showstate functionality for 'free'
@@ -548,16 +539,16 @@ do
 		s.condition = condition
 		s:SetWidth(s:GetWidth() + 28)
 
-		local title = _G[s:GetName() .. 'Text']
+		local title = _G[s:GetName() .. "Text"]
 		title:ClearAllPoints()
-		title:SetPoint('BOTTOMLEFT', s, 'TOPLEFT')
-		title:SetJustifyH('LEFT')
+		title:SetPoint("BOTTOMLEFT", s, "TOPLEFT")
+		title:SetJustifyH("LEFT")
 		title:SetText(text or condition)
 
 		local value = s.valText
 		value:ClearAllPoints()
-		value:SetPoint('BOTTOMRIGHT', s, 'TOPRIGHT')
-		value:SetJustifyH('RIGHT')
+		value:SetPoint("BOTTOMRIGHT", s, "TOPRIGHT")
+		value:SetJustifyH("RIGHT")
 
 		return s
 	end
@@ -583,26 +574,26 @@ do
 
 	--GetSpellInfo(spellID) is awesome for localization
 	local function AddClass(self)
-		local lClass, class = UnitClass('player')
-		if class == 'WARRIOR' or class == 'DRUID' or class == 'PRIEST' or class == 'ROGUE' or class == 'WARLOCK' then
+		local lClass, class = UnitClass("player")
+		if class == "WARRIOR" or class == "DRUID" or class == "PRIEST" or class == "ROGUE" or class == "WARLOCK" then
 			local p = self:NewPanel(lClass)
-			if class == 'WARRIOR' then
-				ConditionSlider_New(p, '[bonusbar:3]', GetSpellInfo(2458))
-				ConditionSlider_New(p, '[bonusbar:2]', GetSpellInfo(71))
-				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(2457))
-			elseif class == 'DRUID' then
-				ConditionSlider_New(p, '[bonusbar:4]', GetSpellInfo(24858))
-				ConditionSlider_New(p, '[bonusbar:3]', GetSpellInfo(5487))
-				ConditionSlider_New(p, '[bonusbar:2]', GetSpellInfo(33891))
-				ConditionSlider_New(p, '[bonusbar:1,stealth]', GetSpellInfo(5215))
-				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(768))
-			elseif class == 'PRIEST' then
-				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(15473))
-			elseif class == 'ROGUE' then
-				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(1784))
-				ConditionSlider_New(p, '[form:3]', GetSpellInfo(51713))
-			elseif class == 'WARLOCK' then
-				ConditionSlider_New(p, '[form:2]', GetSpellInfo(47241))
+			if class == "WARRIOR" then
+				ConditionSlider_New(p, "[bonusbar:3]", GetSpellInfo(2458))
+				ConditionSlider_New(p, "[bonusbar:2]", GetSpellInfo(71))
+				ConditionSlider_New(p, "[bonusbar:1]", GetSpellInfo(2457))
+			elseif class == "DRUID" then
+				ConditionSlider_New(p, "[bonusbar:4]", GetSpellInfo(24858))
+				ConditionSlider_New(p, "[bonusbar:3]", GetSpellInfo(5487))
+				ConditionSlider_New(p, "[bonusbar:2]", GetSpellInfo(33891))
+				ConditionSlider_New(p, "[bonusbar:1,stealth]", GetSpellInfo(5215))
+				ConditionSlider_New(p, "[bonusbar:1]", GetSpellInfo(768))
+			elseif class == "PRIEST" then
+				ConditionSlider_New(p, "[bonusbar:1]", GetSpellInfo(15473))
+			elseif class == "ROGUE" then
+				ConditionSlider_New(p, "[bonusbar:1]", GetSpellInfo(1784))
+				ConditionSlider_New(p, "[form:3]", GetSpellInfo(51713))
+			elseif class == "WARLOCK" then
+				ConditionSlider_New(p, "[form:2]", GetSpellInfo(47241))
 			end
 		end
 	end
@@ -610,56 +601,58 @@ do
 	local function AddPaging(self)
 		local p = self:NewPanel(L.QuickPaging)
 		for i = 6, 2, -1 do
-			ConditionSlider_New(p, format('[bar:%d]', i), _G['BINDING_NAME_ACTIONPAGE' .. i])
+			ConditionSlider_New(p, format("[bar:%d]", i), _G["BINDING_NAME_ACTIONPAGE" .. i])
 		end
 	end
 
 	local function AddModifier(self)
 		local p = self:NewPanel(L.Modifiers)
-		ConditionSlider_New(p, '[mod:SELFCAST]', AUTO_SELF_CAST_KEY_TEXT)
-		ConditionSlider_New(p, '[mod:alt,mod:ctrl,mod:shift]', L.CtrlAltShift)
-		ConditionSlider_New(p, '[mod:alt,mod:shift]', L.AltShift)
-		ConditionSlider_New(p, '[mod:ctrl,mod:shift]', L.CtrlShift)
-		ConditionSlider_New(p, '[mod:alt,mod:ctrl]', L.CtrlAlt)
-		ConditionSlider_New(p, '[mod:shift]', SHIFT_KEY)
-		ConditionSlider_New(p, '[mod:alt]', ALT_KEY)
-		ConditionSlider_New(p, '[mod:ctrl]', CTRL_KEY)
+		ConditionSlider_New(p, "[mod:SELFCAST]", AUTO_SELF_CAST_KEY_TEXT)
+		ConditionSlider_New(p, "[mod:alt,mod:ctrl,mod:shift]", L.CtrlAltShift)
+		ConditionSlider_New(p, "[mod:alt,mod:shift]", L.AltShift)
+		ConditionSlider_New(p, "[mod:ctrl,mod:shift]", L.CtrlShift)
+		ConditionSlider_New(p, "[mod:alt,mod:ctrl]", L.CtrlAlt)
+		ConditionSlider_New(p, "[mod:shift]", SHIFT_KEY)
+		ConditionSlider_New(p, "[mod:alt]", ALT_KEY)
+		ConditionSlider_New(p, "[mod:ctrl]", CTRL_KEY)
 	end
 
 	local function AddTargeting(self)
 		local p = self:NewPanel(L.Targeting)
-		ConditionSlider_New(p, '[noexists]', NONE)
-		ConditionSlider_New(p, '[harm]', L.Harm)
-		ConditionSlider_New(p, '[help]', L.Help)
+		ConditionSlider_New(p, "[noexists]", NONE)
+		ConditionSlider_New(p, "[harm]", L.Harm)
+		ConditionSlider_New(p, "[help]", L.Help)
 	end
 
 	local function AddShowState(self)
 		local p = self:NewPanel(L.ShowStates)
 		p.height = 56
 
-		local editBox = CreateFrame('EditBox', p:GetName() .. 'StateText', p,  'InputBoxTemplate')
-		editBox:SetWidth(148) editBox:SetHeight(20)
-		editBox:SetPoint('TOPLEFT', 12, -10)
+		local editBox = CreateFrame("EditBox", p:GetName() .. "StateText", p, "InputBoxTemplate")
+		editBox:SetWidth(148)
+		editBox:SetHeight(20)
+		editBox:SetPoint("TOPLEFT", 12, -10)
 		editBox:SetAutoFocus(false)
-		editBox:SetScript('OnShow', function(self)
-			self:SetText(self:GetParent().owner:GetShowStates() or '')
+		editBox:SetScript("OnShow", function(self)
+			self:SetText(self:GetParent().owner:GetShowStates() or "")
 		end)
-		editBox:SetScript('OnEnterPressed', function(self)
+		editBox:SetScript("OnEnterPressed", function(self)
 			local text = self:GetText()
-			self:GetParent().owner:SetShowStates(text ~= '' and text or nil)
+			self:GetParent().owner:SetShowStates(text ~= "" and text or nil)
 		end)
-		editBox:SetScript('OnEditFocusLost', function(self) self:HighlightText(0, 0) end)
-		editBox:SetScript('OnEditFocusGained', function(self) self:HighlightText() end)
+		editBox:SetScript("OnEditFocusLost", function(self) self:HighlightText(0, 0) end)
+		editBox:SetScript("OnEditFocusGained", function(self) self:HighlightText() end)
 
-		local set = CreateFrame('Button', p:GetName() .. 'Set', p, 'UIPanelButtonTemplate')
-		set:SetWidth(30) set:SetHeight(20)
+		local set = CreateFrame("Button", p:GetName() .. "Set", p, "UIPanelButtonTemplate")
+		set:SetWidth(30)
+		set:SetHeight(20)
 		set:SetText(L.Set)
-		set:SetScript('OnClick', function(self)
+		set:SetScript("OnClick", function(self)
 			local text = editBox:GetText()
-			self:GetParent().owner:SetShowStates(text ~= '' and text or nil)
-			editBox:SetText(self:GetParent().owner:GetShowStates() or '')
+			self:GetParent().owner:SetShowStates(text ~= "" and text or nil)
+			editBox:SetText(self:GetParent().owner:GetShowStates() or "")
 		end)
-		set:SetPoint('BOTTOMRIGHT', -8, 2)
+		set:SetPoint("BOTTOMRIGHT", -8, 2)
 
 		return p
 	end
@@ -667,7 +660,7 @@ do
 	function ActionBar:CreateMenu()
 		local menu = Dominos:NewMenu(self.id)
 
-		L = LibStub('AceLocale-3.0'):GetLocale('Dominos-Config')
+		L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
 		AddLayout(menu)
 		AddClass(menu)
 		AddPaging(menu)

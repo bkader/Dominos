@@ -379,14 +379,7 @@ local function AddTexturePanel(menu)
 	local name = p:GetName()
 	local scroll = CreateFrame("ScrollFrame", name .. "ScrollFrame", p, "FauxScrollFrameTemplate")
 	scroll:SetScript("OnVerticalScroll", function(self, arg1)
-		FauxScrollFrame_OnVerticalScroll(
-			self,
-			arg1,
-			height + offset,
-			function()
-				p:UpdateList()
-			end
-		)
+		FauxScrollFrame_OnVerticalScroll(self, arg1, height + offset, function() p:UpdateList() end)
 	end)
 	scroll:SetScript("OnShow", function() p.buttons[1]:SetWidth(width) end)
 	scroll:SetScript("OnHide", function() p.buttons[1]:SetWidth(width + 20) end)
