@@ -9,7 +9,9 @@ function DRB:Load()
 end
 
 function DRB:Unload()
-	self.frame:Free()
+	if self.frame then
+		self.frame:Free()
+	end
 end
 
 --[[ Roll Bar Object ]]
