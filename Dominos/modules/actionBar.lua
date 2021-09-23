@@ -148,7 +148,7 @@ hooksecurefunc("ActionButton_UpdateUsable", function(self)
 	if valid == 0 then
 		icon:SetVertexColor(1.0, 0.1, 0.1)
 	elseif not IsUsableAction(self.action) then
-		icon:SetVertexColor(0.5, 0.5, 1.0)
+		icon:SetVertexColor(0.4, 0.4, 0.4)
 	else
 		icon:SetVertexColor(1.0, 1.0, 1.0)
 	end
@@ -191,11 +191,13 @@ function ActionButton:LoadAction()
 end
 
 function ActionButton:Skin()
-	if LBF then
-		LBF:Group("Dominos", "Action Bar"):AddButton(self)
-	else
+	if not Dominos:Masque("Action Bar", self) then
 		_G[self:GetName() .. "Icon"]:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 		self:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
+
+		if _G[self:GetName() .. "FloatingBG"] then
+			_G[self:GetName() .. "FloatingBG"]:Hide()
+		end
 	end
 end
 

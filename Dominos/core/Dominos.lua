@@ -36,6 +36,8 @@ Dominos.callbacks = Dominos.callbacks or LibStub("CallbackHandler-1.0"):New(Domi
 local L = LibStub("AceLocale-3.0"):GetLocale("Dominos")
 local CURRENT_VERSION = GetAddOnMetadata("Dominos", "Version")
 
+local MSQ, LBF
+
 -- startup
 function Dominos:OnInitialize()
 	--register database events
@@ -73,7 +75,7 @@ function Dominos:OnInitialize()
 	kb.RegisterCallback(self, "LIBKEYBOUND_DISABLED")
 
 	-- button facade support
-	local LBF = LibStub("LibButtonFacade", true)
+	LBF = LBF or LibStub("LibButtonFacade", true)
 	if LBF then
 		LBF:RegisterSkinCallback("Dominos", self.OnSkin, self)
 	end
@@ -944,6 +946,34 @@ end
 
 function Dominos:IsLinkedOpacityEnabled()
 	return self.db.profile.linkedOpacity
+end
+
+--[[ Masque/ButtonFacade Support ]]--
+
+do
+	local LIB
+
+	function Dominos:Masque(group, button, buttonData)
+		MSQ = MSQ or LibStub("Masque", true)
+		LBF = LBF or LibStub("LibButtonFacade", true)
+
+		LIB = LIB or MSQ or LBF
+		if LIB then
+			LIB:Group("Dominos", group):AddButton(button, buttonData)
+			return true
+		end
+	end
+
+	function Dominos:RemoveMasque(group, button)
+		MSQ = MSQ or LibStub("Masque", true)
+		LBF = LBF or LibStub("LibButtonFacade", true)
+
+		LIB = LIB or MSQ or LBF
+		if LIB then
+			LIB:Group("Dominos", group):RemoveButton(button)
+			return true
+		end
+	end
 end
 
 -- utility function: create a widget class
