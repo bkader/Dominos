@@ -9,7 +9,6 @@ local format = string.format
 local MAX_BUTTONS = 120
 local NUM_POSSESS_BAR_BUTTONS = 12
 local KeyBound = LibStub("LibKeyBound-1.0")
-local LBF = LibStub("LibButtonFacade", true)
 
 --[[ Action Button ]]--
 local ActionButton = Dominos:CreateClass("CheckButton", Dominos.BindableButton)

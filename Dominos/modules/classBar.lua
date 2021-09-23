@@ -8,7 +8,6 @@ local format = string.format
 local BUTTON_SIZE = 30
 local NT_SIZE = (66 / 36) * BUTTON_SIZE
 local KeyBound = LibStub("LibKeyBound-1.0")
-local LBF = LibStub("LibButtonFacade", true)
 
 --[[ Class Button ]]
 local ClassButton = Dominos:CreateClass("CheckButton", Dominos.BindableButton)
@@ -63,15 +62,16 @@ function ClassButton:Create(id)
 	b:UpdateSpell()
 	b:UpdateEvents()
 	b:UpdateHotkey()
+	b:Skin()
 
-	if LBF then
-		LBF:Group("Dominos", "Class Bar"):AddButton(b)
-	else
+	return b
+end
+
+function ClassButton:Skin()
+	if not Dominos:Masque("Class Bar", self) then
 		b.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 		b:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
 	end
-
-	return b
 end
 
 function ClassButton:Restore(id)

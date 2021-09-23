@@ -4,7 +4,6 @@ local Dominos = Dominos
 local BuffsModule = Dominos:NewModule("Buffs")
 local BuffsFrame = Dominos:CreateClass("Frame", Dominos.Frame)
 local L
-local LBF = LibStub("LibButtonFacade", true)
 
 function BuffsModule:OnInitialize()
 	if Dominos:UseAuras() then
@@ -25,9 +24,7 @@ function BuffsModule:Unload()
 end
 
 function BuffsFrame:SkinButton(btn)
-	if LBF then
-		LBF:Group("Dominos", "Buffs"):AddButton(btn)
-	end
+	return Dominos:Masque("Buffs", btn)
 end
 
 function BuffsFrame:New()

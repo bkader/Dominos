@@ -3,7 +3,6 @@ local Dominos = Dominos
 
 local NT_RATIO = 64 / 37
 local _G = _G
-local LBF = LibStub("LibButtonFacade", true)
 
 --load up the bag set...
 local bags = {}
@@ -73,15 +72,7 @@ function BagBar:New()
 end
 
 function BagBar:SkinButton(b)
-	if b.skinned then
-		return
-	end
-
-	if LBF then
-		LBF:Group("Dominos", "Bag Bar"):AddButton(b, {Icon = _G[b:GetName() .. "IconTexture"]})
-	end
-
-	b.skinned = true
+	return Dominos:Masque("Bag Bar", b)
 end
 
 function BagBar:GetDefaults()

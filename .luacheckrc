@@ -43,6 +43,7 @@ globals = {
 	"bit",
 
 	-- dominos
+	"Dominos",
 	"GetMinimapShape",
 	"MultiActionBar_Update",
 	"MultiActionBar_UpdateGrid",

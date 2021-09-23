@@ -4,7 +4,6 @@ local Dominos = Dominos
 local DebuffModule = Dominos:NewModule("Debuffs")
 local DebuffsFrame = Dominos:CreateClass("Frame", Dominos.Frame)
 local L
-local LBF = LibStub("LibButtonFacade", true)
 
 function DebuffModule:OnInitialize()
 	if not Dominos:UseAuras() then
@@ -28,9 +27,7 @@ function DebuffModule:Unload()
 end
 
 function DebuffsFrame:SkinButton(btn)
-	if LBF then
-		LBF:Group("Dominos", "Debuffs"):AddButton(btn)
-	end
+	return Dominos:Masque("Debuffs", btn)
 end
 
 function DebuffsFrame:New()
