@@ -26,7 +26,7 @@ function class:New()
 	return f
 end
 
-function TitleBoxMaker(parent)
+local function TitleBoxMaker(parent)
 	local header = parent:CreateTexture(parent:GetName() .. "TitleBox", "ARTWORK")
 	header:SetHeight(32)
 	header:SetPoint("LEFT", parent, "TOPLEFT", 7, -4)

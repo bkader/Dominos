@@ -69,15 +69,15 @@ end
 
 function ClassButton:Skin()
 	if not Dominos:Masque("Class Bar", self) then
-		b.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
-		b:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
+		self.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+		self:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
 	end
 end
 
 function ClassButton:Restore(id)
 	local unused = self.unused
 	if unused then
-		b = unused[id]
+		local b = unused[id]
 		if b then
 			unused[id] = nil
 			b:Show()
