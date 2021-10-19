@@ -992,3 +992,82 @@ function Dominos:CreateClass(type, parentClass)
 
 	return class
 end
+
+-- Delayed Stuff
+do
+	local new, del
+	do
+		local waitPool = {}
+		function new()
+			local t = next(waitPool) or {}
+			waitPool[t] = nil
+			return t
+		end
+		function del(t)
+			if t then
+				t[true] = true
+				t[true] = nil
+				waitPool[t] = true
+			end
+			return nil
+		end
+	end
+
+	local WaitTable = {}
+
+	local function WaitFrame_OnUpdate(self, elapsed)
+		local total = #WaitTable
+		local i = 1
+
+		while i <= total do
+			local data = WaitTable[i]
+
+			if data[1] > elapsed then
+				data[1] = data[1] - elapsed
+				i = i + 1
+			else
+				del(tremove(WaitTable, i))
+
+				if data[3] then
+					if data[3] > 1 then
+						data[2](unpack(data[4], 1, data[3]))
+					else
+						data[2](data[4])
+					end
+				else
+					data[2]()
+				end
+
+				total = total - 1
+			end
+		end
+
+		if #WaitTable == 0 then
+			self:Hide()
+		end
+	end
+
+	local WaitFrame = CreateFrame("Frame", "Dominos_WaitFrame", UIParent)
+	WaitFrame:SetScript("OnUpdate", WaitFrame_OnUpdate)
+
+	function Dominos:Delay(delay, func, ...)
+		if type(delay) ~= "number" then
+			error(("Bad argument #1 to 'Delay' (number expected, got %s)"):format(delay ~= nil and type(delay) or "no value"), 2)
+		elseif type(func) ~= "function" then
+			error(("Bad argument #2 to 'Delay' (function expected, got %s)"):format(func ~= nil and type(func) or "no value"), 2)
+		end
+
+		local argCount = select("#", ...)
+
+		local timer = new()
+		timer[1] = delay
+		timer[2] = func
+		timer[3] = argCount > 0 and argCount
+		timer[4] = argCount == 1 and (...) or argCount > 1 and {...}
+
+		tinsert(WaitTable, timer)
+
+		WaitFrame:Show()
+		return true
+	end
+end

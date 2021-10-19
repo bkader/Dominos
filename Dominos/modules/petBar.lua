@@ -5,14 +5,44 @@ local _G = _G
 local format = string.format
 
 local KeyBound = LibStub("LibKeyBound-1.0")
-local unused
+local unused, hooked
 
 --[[ Pet Button ]]
 local PetButton = Dominos:CreateClass("CheckButton", Dominos.BindableButton)
 
+local function Dominos_RestoreSaturation(self, icon)
+	if icon and icon:IsDesaturated() then
+		icon:SetDesaturated(false)
+	end
+end
+
+local function Dominos_PetActionBar_UpdateCooldowns(self)
+	for i = 1, NUM_PET_ACTION_SLOTS, 1 do
+		local icon = _G["PetActionButton" .. i .. "Icon"]
+		if icon then
+			local start, duration = GetPetActionCooldown(i)
+			if duration and duration >= 2.01 then
+				local nextTime = math.ceil(start + duration - GetTime())
+				Dominos:Delay(math.min(duration, nextTime), Dominos_RestoreSaturation, self, icon)
+
+				if not icon:IsDesaturated() then
+					icon:SetDesaturated(true)
+				end
+			else
+				Dominos_RestoreSaturation(self)
+			end
+		end
+	end
+end
+
 function PetButton:New(id)
 	local b = self:Restore(id) or self:Create(id)
 	b:UpdateHotkey()
+
+	if not hooked then
+		hooksecurefunc("PetActionBar_UpdateCooldowns", Dominos_PetActionBar_UpdateCooldowns)
+		hooked = true
+	end
 
 	return b
 end

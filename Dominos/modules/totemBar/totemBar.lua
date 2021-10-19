@@ -5,13 +5,11 @@ A dominos totem bar
 --no reason to load if we're not playing a shaman...
 assert(Dominos, "Dominos not found!")
 
-if select(2, UnitClass("player")) ~= "SHAMAN" then
-	return
-end
+if select(2, UnitClass("player")) ~= "SHAMAN" then return end
 
 local Dominos = Dominos
 local DTB = Dominos:NewModule("totems", "AceEvent-3.0")
-local TotemBar
+local TotemBar, hooked
 
 --hurray for constants
 local MAX_TOTEMS = MAX_TOTEMS --fire, earth, water, air
@@ -45,13 +43,40 @@ function DTB:PLAYER_REGEN_ENABLED()
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 end
 
-function DTB:LoadTotemBars()
-	for i, spell in pairs(SUMMON_SPELLS) do
-		local f = Dominos.Frame:Get("totem" .. i)
-		if f then
-			f:LoadButtons()
+do
+	local function Dominos_RestoreSaturation(self, icon)
+		if icon and icon:IsDesaturated() then
+			icon:SetDesaturated(false)
+		end
+	end
+
+	local function Dominos_TotemButton_Update(button, start, duration)
+		local icon = _G[button:GetName() .. "IconTexture"]
+		if duration and duration >= 2.01 then
+			local nextTime = math.ceil(start + duration - GetTime())
+			Dominos:Delay(math.min(duration, nextTime), Dominos_RestoreSaturation, button, icon)
+
+			if not icon:IsDesaturated() then
+				icon:SetDesaturated(true)
+			end
 		else
-			TotemBar:New(i, spell)
+			Dominos_RestoreSaturation(button)
+		end
+	end
+
+	function DTB:LoadTotemBars()
+		for i, spell in pairs(SUMMON_SPELLS) do
+			local f = Dominos.Frame:Get("totem" .. i)
+			if f then
+				f:LoadButtons()
+			else
+				TotemBar:New(i, spell)
+			end
+		end
+
+		if not hooked then
+			hooksecurefunc("TotemButton_Update", Dominos_TotemButton_Update)
+			hooked = true
 		end
 	end
 end

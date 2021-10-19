@@ -141,6 +141,7 @@ hooksecurefunc("ActionButton_OnEvent", function(self, event, ...)
 		self.newTimer = self.rangeTimer
 	end
 end)
+
 hooksecurefunc("ActionButton_UpdateUsable", function(self)
 	local icon = _G[self:GetName() .. "Icon"]
 	local valid = IsActionInRange(self.action)
@@ -152,6 +153,34 @@ hooksecurefunc("ActionButton_UpdateUsable", function(self)
 		icon:SetVertexColor(1.0, 1.0, 1.0)
 	end
 end)
+
+do
+	local function Dominos_RestoreSaturation(self, icon)
+		if icon and icon:IsDesaturated() then
+			icon:SetDesaturated(false)
+		end
+	end
+
+	local function Dominos_ActionButton_UpdateCooldown(self)
+		local icon = _G[self:GetName() .. "Icon"]
+		if icon and self.action then
+			local start, duration = GetActionCooldown(self.action)
+			if duration and duration >= 2.01 then
+				local nextTime = math.ceil(start + duration - GetTime())
+				Dominos:Delay(math.min(duration, nextTime), Dominos_RestoreSaturation, self, icon)
+
+				if not icon:IsDesaturated() then
+					icon:SetDesaturated(true)
+				end
+			else
+				Dominos_RestoreSaturation(self)
+			end
+		end
+	end
+
+	hooksecurefunc("ActionButton_UpdateCooldown", Dominos_ActionButton_UpdateCooldown)
+end
+
 hooksecurefunc("ActionButton_OnUpdate", function(self, elapsed)
 	local rangeTimer = self.newTimer
 	if rangeTimer then
