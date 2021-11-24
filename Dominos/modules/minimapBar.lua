@@ -153,7 +153,7 @@ local function AddShowState(self)
 end
 
 function class:CreateMenu()
-	local menu = Dominos:NewMenu(self.id)
+	local menu = self.menu or Dominos:NewMenu(self.id)
 	L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
 	AddLayoutPanel(menu)
 	AddShowState(menu)

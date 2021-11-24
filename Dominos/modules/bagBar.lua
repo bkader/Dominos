@@ -152,7 +152,7 @@ function BagBar:NumButtons()
 end
 
 function BagBar:CreateMenu()
-	local menu = Dominos:NewMenu(self.id)
+	local menu = self.menu or Dominos:NewMenu(self.id)
 	local panel = menu:AddLayoutPanel()
 	local L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
 

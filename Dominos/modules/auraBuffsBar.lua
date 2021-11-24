@@ -121,7 +121,7 @@ local function AddAdvancedLayout(self)
 end
 
 function BuffsFrame:CreateMenu()
-    local menu = Dominos:NewMenu(self.id)
+    local menu = self.menu or Dominos:NewMenu(self.id)
     AddLayoutPanel(menu)
     AddAdvancedLayout(menu)
     self.menu = menu

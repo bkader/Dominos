@@ -117,7 +117,7 @@ local function AddShowState(self)
 end
 
 function class:CreateMenu()
-    local menu = Dominos:NewMenu(self.id)
+    local menu = self.menu or Dominos:NewMenu(self.id)
     AddLayoutPanel(menu)
     AddShowState(menu)
     self.menu = menu

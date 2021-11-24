@@ -1,22 +1,23 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<!-- Default modules -->
-	<Script file="actionBar.lua" />
-	<Script file="petBar.lua" />
-	<Script file="classBar.lua" />
-	<Script file="bagBar.lua" />
-	<Script file="menuBar.lua" />
-	<Script file="vehicleBar.lua" />
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+<!-- Default modules -->
+<Script file="actionBar.lua" />
+<Script file="petBar.lua" />
+<Script file="classBar.lua" />
+<Script file="bagBar.lua" />
+<Script file="menuBar.lua" />
+<Script file="vehicleBar.lua" />
 
-	<!-- Integrated external modules -->
-	<Include file="castBar\castBar.xml" />
-	<Include file="totemBar\totemBar.xml" />
-	<Script file="rollBar.lua" />
-	<Script file="xpBar.lua" />
+<!-- Integrated external modules -->
+<Include file="castBar\castBar.xml" />
+<Include file="totemBar\totemBar.xml" />
+<Script file="rollBar.lua" />
+<Script file="xpBar.lua" />
 
-	<!-- Additional custom modules -->
-	<Script file="auraBuffsBar.lua" />
-	<Script file="auraDebuffsBar.lua" />
-	<Script file="minimapBar.lua" />
-	<Script file="minimapZoneTextBar.lua" />
-	<Script file="questTracker.lua" />
+<!-- Additional custom modules -->
+<Script file="auraBuffsBar.lua" />
+<Script file="auraDebuffsBar.lua" />
+<Script file="minimapBar.lua" />
+<Script file="minimapZoneTextBar.lua" />
+<Script file="questTracker.lua" />
 </Ui>

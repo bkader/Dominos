@@ -2,9 +2,10 @@
 ## Title: Dominos
 ## Notes: A main actionbar replacement
 ## Author: Tuller (Kader's Edition)
-## Version: 1.18.6
+## Version: 1.18.7
 ## SavedVariables: DominosDB, DominosVersion
 ## OptionalDeps: Ace3, LibKeyBound-1.0, ButtonFacade
+## X-Date: 2021-11-24 @ 00:30 AM |cff808080UTC|r
 
 libs\_load.xml
 locales\_load.xml

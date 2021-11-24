@@ -77,7 +77,7 @@ do
 		end
 	end
 
-	function Panel:NewSlider(text, low, high, step)
+	function Panel:NewSlider(text, low, high, step, showText)
 		local name = self:GetName() .. text
 		local f = CreateFrame("Slider", name, self, "OptionsSliderTemplate")
 		f:SetScript("OnMouseWheel", Slider_OnMouseWheel)
@@ -86,8 +86,13 @@ do
 		f:EnableMouseWheel(true)
 
 		_G[name .. "Text"]:SetText(text)
-		_G[name .. "Low"]:SetText("")
-		_G[name .. "High"]:SetText("")
+		if showText then
+			_G[name .. "Low"]:SetText(low)
+			_G[name .. "High"]:SetText(high)
+		else
+			_G[name .. "Low"]:SetText("")
+			_G[name .. "High"]:SetText("")
+		end
 
 		local t = f:CreateFontString(nil, "BACKGROUND", "GameFontHighlightSmall")
 		t:SetPoint("LEFT", f, "RIGHT", 7, 0)

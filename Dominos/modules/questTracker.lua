@@ -146,19 +146,19 @@ function class:ToggleScroll(enable)
 	class:EnableScroll(self)
 end
 
-function class:SetUpContainer(self)
-	self.WFC.scrollframe.scroll:SetValue(1)
+function class:SetUpContainer(f)
+	f.WFC.scrollframe.scroll:SetValue(1)
 	WatchFrame_Update()
 	WatchFrame:ClearAllPoints()
-	WatchFrame:SetHeight(self.sets.height)
+	WatchFrame:SetHeight(f.sets.height)
 	WatchFrame:SetMovable(true)
 	WatchFrame:SetUserPlaced(true)
 
-	WatchFrame:SetParent(self.scrollchild)
+	WatchFrame:SetParent(f.scrollchild)
 	WatchFrame:SetClampedToScreen(false)
 	WatchFrame:SetPoint("TOPLEFT", 24, 0)
 
-	WatchFrameCollapseExpandButton:SetParent(self.WFC)
+	WatchFrameCollapseExpandButton:SetParent(f.WFC)
 	WatchFrameCollapseExpandButton:ClearAllPoints()
 	WatchFrameCollapseExpandButton:SetPoint("TOPRIGHT", -1, 0)
 
@@ -174,7 +174,7 @@ function class:SetUpContainer(self)
 	WatchFrameCollapseExpandButton:Show()
 	--Had to increase the frame level so
 	--the button would stay on top of the scroll bar
-	WatchFrameCollapseExpandButton:SetFrameLevel(self.WFC.scrollframe.scroll:GetFrameLevel() + 3)
+	WatchFrameCollapseExpandButton:SetFrameLevel(f.WFC.scrollframe.scroll:GetFrameLevel() + 3)
 	WatchFrameCollapseExpandButton.Hide = function() end
 	WatchFrameCollapseExpandButton.Disable = function() end
 	WatchFrameCollapseExpandButton:RegisterForClicks("AnyDown")
@@ -186,8 +186,8 @@ function class:SetUpContainer(self)
 			ToggleFrame(QuestLogFrame)
 		else
 			WatchFrame_CollapseExpandButton_OnClick()
-			if not self.sets.disablescroll then
-				local scroll = self.WFC.scrollframe.scroll
+			if not f.sets.disablescroll then
+				local scroll = f.WFC.scrollframe.scroll
 				if scroll:IsVisible() then
 					scroll:Hide()
 				else
@@ -198,8 +198,8 @@ function class:SetUpContainer(self)
 	end)
 
 	WatchFrameHeader:ClearAllPoints()
-	WatchFrameHeader:SetAllPoints(self.WFC.title)
-	WatchFrameHeader:SetParent(self.WFC)
+	WatchFrameHeader:SetAllPoints(f.WFC.title)
+	WatchFrameHeader:SetParent(f.WFC)
 	WatchFrameHeader:SetFrameLevel(WatchFrameHeader:GetParent():GetFrameLevel() + 2)
 	WatchFrameTitle:ClearAllPoints()
 	WatchFrameTitle:SetPoint("CENTER")
@@ -264,7 +264,7 @@ end
 
 --[[ Menu Code ]]
 function class:CreateMenu()
-	local menu = Dominos:NewMenu(self.id)
+	local menu = self.menu or Dominos:NewMenu(self.id)
 	L = L or LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
 	AddLayoutPanel(menu)
 	self.menu = menu

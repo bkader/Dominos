@@ -704,7 +704,7 @@ end
 
 --[[ Menus ]]--
 function Frame:CreateMenu()
-	self.menu = Dominos:NewMenu(self.id)
+	self.menu = self.menu or Dominos:NewMenu(self.id)
 	self.menu:AddLayoutPanel()
 	self.menu:AddAdvancedPanel()
 end

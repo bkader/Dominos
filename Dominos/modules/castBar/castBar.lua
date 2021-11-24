@@ -102,7 +102,7 @@ function CastBar:UpdateText()
 end
 
 function CastBar:CreateMenu()
-	local menu = Dominos:NewMenu(self.id)
+	local menu = self.menu or Dominos:NewMenu(self.id)
 	local panel = menu:NewPanel(LibStub("AceLocale-3.0"):GetLocale("Dominos-Config").Layout)
 
 	local time = panel:NewCheckButton(L.ShowTime)

@@ -310,7 +310,7 @@ ActionBar.conditions = {
 	"[noexists]"
 }
 
-ActionBar.class = select(2, UnitClass("player"))
+ActionBar.class = Dominos.MyClass
 local active = {}
 
 function ActionBar:New(id)
@@ -688,7 +688,7 @@ do
 	end
 
 	function ActionBar:CreateMenu()
-		local menu = Dominos:NewMenu(self.id)
+		local menu = self.menu or Dominos:NewMenu(self.id)
 
 		L = LibStub("AceLocale-3.0"):GetLocale("Dominos-Config")
 		AddLayout(menu)
@@ -699,6 +699,6 @@ do
 		AddShowState(menu)
 		AddAdvancedLayout(menu)
 
-		ActionBar.menu = menu
+		self.menu = menu
 	end
 end

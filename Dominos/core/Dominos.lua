@@ -32,6 +32,7 @@ Driver for Dominos Frames
 --]]
 Dominos = LibStub("AceAddon-3.0"):NewAddon("Dominos", "AceEvent-3.0", "AceConsole-3.0")
 Dominos.callbacks = Dominos.callbacks or LibStub("CallbackHandler-1.0"):New(Dominos)
+Dominos.MyClass = select(2, UnitClass("player"))
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Dominos")
 local CURRENT_VERSION = GetAddOnMetadata("Dominos", "Version")
@@ -154,6 +155,7 @@ function Dominos:GetDefaults()
 		bagStyle = {"Entropy: Bronze", 0.5, nil},
 		buffStyle = {"Entropy: Bronze", 0.5, nil},
 		debuffStyle = {"Entropy: Bronze", 0.5, nil},
+		totemBar = {Anchor = "CENTER", X = 0, Y = 0, Scale = 1},
 		frames = {}
 	}}
 end
@@ -637,13 +639,22 @@ end
 
 function Dominos:SetLock(enable)
 	self.locked = enable or false
+
 	if self:Locked() then
 		self.Frame:ForAll("Lock")
 		self:HideConfigHelper()
+
+		if self.aTotemBar then
+			self.aTotemBar:Lock()
+		end
 	else
 		self.Frame:ForAll("Unlock")
 		LibStub("LibKeyBound-1.0"):Deactivate()
 		self:ShowConfigHelper()
+
+		if self.aTotemBar then
+			self.aTotemBar:Unlock()
+		end
 	end
 end
 
@@ -888,6 +899,15 @@ end
 
 function Dominos:SetUseQuest(enable)
 	self.db.profile.useQuest = enable or false
+end
+
+--default totems bar
+function Dominos:ATotemBar()
+	return self.db.profile.atotemBar
+end
+
+function Dominos:SetATotemBar(enable)
+	self.db.profile.atotemBar = enable or false
 end
 
 --minimap frame
