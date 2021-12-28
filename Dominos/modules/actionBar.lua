@@ -144,13 +144,17 @@ end)
 
 hooksecurefunc("ActionButton_UpdateUsable", function(self)
 	local icon = _G[self:GetName() .. "Icon"]
-	local valid = IsActionInRange(self.action)
-	if valid == 0 then
+	local inRange = IsActionInRange(self.action)
+	local isUsable, notEnoughMana = IsUsableAction(self.action)
+
+	if inRange == 0 then
 		icon:SetVertexColor(1.0, 0.1, 0.1)
-	elseif not IsUsableAction(self.action) then
-		icon:SetVertexColor(0.4, 0.4, 0.4)
-	else
+	elseif isUsable then
 		icon:SetVertexColor(1.0, 1.0, 1.0)
+	elseif notEnoughMana then
+		icon:SetVertexColor(0.5, 0.5, 1.0)
+	else
+		icon:SetVertexColor(0.4, 0.4, 0.4)
 	end
 end)
 
