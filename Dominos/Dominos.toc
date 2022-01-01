@@ -5,7 +5,7 @@
 ## Version: 1.18.7
 ## SavedVariables: DominosDB, DominosVersion
 ## OptionalDeps: Ace3, LibKeyBound-1.0, ButtonFacade
-## X-Date: 2021-12-28 @ 03:48 AM |cff808080UTC|r
+## X-Date: 2022-01-01 @ 01:10 PM |cff808080UTC|r
 
 libs\_load.xml
 locales\_load.xml
