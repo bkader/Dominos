@@ -306,6 +306,20 @@ do
 		end
 	end
 
+	local function aTotemBar_PLAYER_ENTERING_WORLD(totemBar)
+		aTotemBar = aTotemBar or totemBar
+		if not aTotemBar then
+			return
+		elseif HasMultiCastActionBar() == false then
+			aTotemBar:Hide()
+		else
+			aTotemBar:Show()
+		end
+		for i = 1, MAX_TOTEMS do
+			Dominos_aTotemBar_Update(i)
+		end
+	end
+
 	local function SetupTotemBar()
 		if aTotemBar then return end
 
@@ -377,23 +391,17 @@ do
 		aTotemBar:RegisterEvent("PLAYER_TOTEM_UPDATE")
 		aTotemBar:SetScript("OnEvent", function(self, event, ...)
 			if event == "PLAYER_ENTERING_WORLD" then
-				if HasMultiCastActionBar() == false then
-					aTotemBar:Hide()
-				else
-					aTotemBar:Show()
-				end
-				for i = 1, MAX_TOTEMS do
-					Dominos_aTotemBar_Update(i)
-				end
+				aTotemBar_PLAYER_ENTERING_WORLD(self)
 			elseif event == "PLAYER_TOTEM_UPDATE" then
 				Dominos_aTotemBar_Update(select(1, ...))
 			end
 		end)
 
 		aTotemBar:SetScript("OnMouseDown", function() aTotemBar:StartMoving() end)
-		aTotemBar:SetScript("OnMouseUp", function(self) aTotemBar:StopMovingOrSizing() end)
+		aTotemBar:SetScript("OnMouseUp", function() aTotemBar:StopMovingOrSizing() end)
 
 		Dominos.aTotemBar = aTotemBar
+		aTotemBar_PLAYER_ENTERING_WORLD(aTotemBar)
 	end
 
 	function Dominos_aTotemBar_Destroy(self, button)
@@ -463,5 +471,6 @@ do
 
 	function DTB:LoadAltTotemBars()
 		SetupTotemBar()
+		Dominos:Delay(0.25, aTotemBar_PLAYER_ENTERING_WORLD, aTotemBar)
 	end
 end
