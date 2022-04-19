@@ -90,10 +90,17 @@ function XP:Load()
 	self:UpdateTextShown()
 end
 
+local wfxf = nil -- frostmourne specific
+local wflv = UnitLevel("player")
 function XP:OnClick(button)
-	if button == "RightButton" and _G.FFF_ReputationWatchBar_OnClick then
-		self:SetAlwaysShowXP(false)
-		FFF_ReputationWatchBar_OnClick(self, button)
+	if button == "RightButton" then
+		wfxf = _G.MainMenuExpBar and _G.MainMenuExpBar:GetScript("OnMouseDown")
+		if wfxf and not IsModifierKeyDown() and wflv < 80 then
+			wfxf(_G.MainMenuExpBar, button)
+		elseif (not wfxf or IsModifierKeyDown()) and _G.FFF_ReputationWatchBar_OnClick then
+			self:SetAlwaysShowXP(false)
+			FFF_ReputationWatchBar_OnClick(self, button)
+		end
 	else
 		self:SetAlwaysShowXP(not self.sets.alwaysShowXP)
 		self:OnEnter()
@@ -172,6 +179,7 @@ function XP:UpdateExperience()
 	local value = UnitXP("player")
 	local max = UnitXPMax("player")
 	local pct = math.floor((value / math.max(max, 1)) * 100 + 0.5)
+	wflv = UnitLevel("player")
 
 	self.value:SetMinMaxValues(0, max)
 	self.value:SetValue(value)
