@@ -47,4 +47,6 @@ L.ShowOptionsTip = "<Right Click> to show the options menu"
 --helper dialog stuff
 L.ConfigMode = "設置模式"
 L.ConfigModeExit = "離開設置模式"
-L.ConfigModeHelp = "<拖動> 動作條.  <右鍵> 打開設置.  <中鍵> 或 <Shift-右鍵> 隱藏/顯示動作條"
+L.ConfigModeHelp = [[<拖動> 動作條.
+<右鍵> 打開設置.
+<中鍵> 或 <Shift-右鍵> 隱藏/顯示動作條]]

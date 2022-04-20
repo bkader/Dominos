@@ -164,7 +164,7 @@ function class:SetUpContainer(f)
 
 	WatchFrameCollapseExpandButton:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self)
-		GameTooltip:AddLine(LD["Objectives Tracker"], 1, 1, 1)
+		GameTooltip:AddLine(LD.QuestTracker, 1, 1, 1)
 		GameTooltip:AddLine(WatchFrame.collapsed and LD.QuestLClick1 or LD.QuestLClick2)
 		GameTooltip:AddLine(LD.QuestRClick)
 		GameTooltip:AddLine(LD.QuestSClick)

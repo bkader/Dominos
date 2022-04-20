@@ -140,8 +140,8 @@ function Menu:AddLayoutPanel()
 	panel.opacitySlider = panel:NewOpacitySlider()
 	panel.fadeSlider = panel:NewFadeSlider()
 	panel.scaleSlider = panel:NewScaleSlider()
-	panel.paddingSlider = panel:NewPaddingSlider()
 	panel.spacingSlider = panel:NewSpacingSlider()
+	panel.paddingSlider = panel:NewPaddingSlider()
 	panel.colsSlider = panel:NewColumnsSlider()
 
 	return panel
@@ -152,6 +152,8 @@ function Menu:AddAdvancedPanel()
 
 	panel:NewLeftToRightCheckbox()
 	panel:NewTopToBottomCheckbox()
+	panel:NewSpacingSliders()
+	panel:NewPaddingSliders()
 
 	panel.width = 250
 	return panel
@@ -378,6 +380,34 @@ do
 	end
 end
 
+--padding (horizontal and vertical)
+do
+	local function HSlider_OnShow(self)
+		self:SetValue(self:GetParent().owner:GetPadding())
+	end
+
+	local function HSlider_UpdateValue(self, value)
+		local _, padH = self:GetParent().owner:GetPadding()
+		self:GetParent().owner:SetPadding(value, padH)
+	end
+
+	local function VSlider_OnShow(self)
+		local _, padH = self:GetParent().owner:GetPadding()
+		self:SetValue(padH)
+	end
+
+	local function VSlider_UpdateValue(self, value)
+		local padW = self:GetParent().owner:GetPadding()
+		self:GetParent().owner:SetPadding(padW, value)
+	end
+
+	function Panel:NewPaddingSliders()
+		local hslider = self:NewSlider(L.PaddingHor, -16, 32, 1, HSlider_OnShow, HSlider_UpdateValue)
+		local vslider = self:NewSlider(L.PaddingVer, -16, 32, 1, VSlider_OnShow, VSlider_UpdateValue)
+		return hslider, vslider
+	end
+end
+
 --spacing
 do
 	local function Slider_OnShow(self)
@@ -390,6 +420,34 @@ do
 
 	function Panel:NewSpacingSlider()
 		return self:NewSlider(L.Spacing, -8, 32, 1, Slider_OnShow, Slider_UpdateValue)
+	end
+end
+
+--spacing (horizontal and vertical)
+do
+	local function HSlider_OnShow(self)
+		self:SetValue(self:GetParent().owner:GetSpacing())
+	end
+
+	local function HSlider_UpdateValue(self, value)
+		local _, vspacing = self:GetParent().owner:GetSpacing()
+		self:GetParent().owner:SetSpacing(value, vspacing)
+	end
+
+	local function VSlider_OnShow(self)
+		local _, vspacing = self:GetParent().owner:GetSpacing()
+		self:SetValue(vspacing)
+	end
+
+	local function VSlider_UpdateValue(self, value)
+		local hspacing = self:GetParent().owner:GetSpacing()
+		self:GetParent().owner:SetSpacing(hspacing, value)
+	end
+
+	function Panel:NewSpacingSliders()
+		local hslider = self:NewSlider(L.SpacingHor, -8, 32, 1, HSlider_OnShow, HSlider_UpdateValue)
+		local vslider = self:NewSlider(L.SpacingVer, -8, 32, 1, VSlider_OnShow, VSlider_UpdateValue)
+		return hslider, vslider
 	end
 end
 

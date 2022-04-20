@@ -191,19 +191,27 @@ function Frame:NumColumns()
 	return self.sets.columns or self:NumButtons()
 end
 
-function Frame:SetSpacing(spacing)
-	self.sets.spacing = spacing
+function Frame:SetSpacing(hspacing, vspacing)
+	if hspacing and not vspacing then
+		self.sets.spacing = hspacing
+		self.sets.hspacing = hspacing
+		self.sets.vspacing = vspacing
+	else
+		self.sets.hspacing = hspacing or self.sets.hspacing or self.sets.spacing
+		self.sets.vspacing = vspacing or self.sets.vspacing or self.sets.spacing
+	end
+
 	self:Layout()
-	Dominos.callbacks:Fire("DOMINOS_SETSPACING", self, spacing)
+	Dominos.callbacks:Fire("DOMINOS_SETSPACING", self, hspacing, vspacing)
 end
 
 function Frame:GetSpacing()
-	return self.sets.spacing or 0
+	return self.sets.hspacing or self.sets.spacing or 0, self.sets.vspacing or self.sets.spacing or 0
 end
 
-function Frame:SetPadding(w, h)
-	self.sets.padW = w
-	self.sets.padH = h or w
+function Frame:SetPadding(padW, padH)
+	self.sets.padW = padW
+	self.sets.padH = padH or padW
 	self:Layout()
 	Dominos.callbacks:Fire("DOMINOS_SETPADDING", self, self.sets.padW, self.sets.padH)
 end
@@ -240,14 +248,14 @@ function Frame:Layout()
 	if #self.buttons > 0 then
 		local cols = min(self:NumColumns(), #self.buttons)
 		local rows = ceil(#self.buttons / cols)
-		local pW, pH = self:GetPadding()
-		local spacing = self:GetSpacing()
+		local padW, padH = self:GetPadding()
+		local hspacing, vspacing = self:GetSpacing()
 		local isLeftToRight = self:GetLeftToRight()
 		local isTopToBottom = self:GetTopToBottom()
 
 		local b = self.buttons[1]
-		local w = b:GetWidth() + spacing
-		local h = b:GetHeight() + spacing
+		local w = b:GetWidth() + hspacing
+		local h = b:GetHeight() + vspacing
 
 		for i, btn in pairs(self.buttons) do
 			local col
@@ -265,11 +273,11 @@ function Frame:Layout()
 			end
 
 			btn:ClearAllPoints()
-			btn:SetPoint("TOPLEFT", w * col + pW, -(h * row + pH))
+			btn:SetPoint("TOPLEFT", w * col + padW, -(h * row + padH))
 		end
 
-		width = w * cols - spacing + pW * 2
-		height = h * ceil(#self.buttons / cols) - spacing + pH * 2
+		width = w * cols - hspacing + padW * 2
+		height = h * ceil(#self.buttons / cols) - vspacing + padH * 2
 	else
 		width = 30
 		height = 30

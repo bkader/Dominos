@@ -44,19 +44,21 @@ L.AvailableProfiles = "Profils disponibles"
 L.PrintVersionDesc = "Afficher la version"
 --dragFrame tooltips
 L.ShowConfig = "<Clic droit> pour configurer"
-L.HideBar = "<Clic milieu ou Shift-Clic droit> pour cacher"
-L.ShowBar = "<Clic milieu ou Shift-Clic droit> pour montrer"
+L.HideBar = "<Clic milieu ou MAJ-Clic droit> pour cacher"
+L.ShowBar = "<Clic milieu ou MAJ-Clic droit> pour montrer"
 L.SetAlpha = "<Roue de souris> pour r\195\169gler l'opacit\195\169 (|cffffffff%d|r)"
 --minimap button stuff
 L.ConfigEnterTip = "<Clic gauche> mode configuration"
 L.ConfigExitTip = "<Clic gauche> sortir du mode configuration"
-L.BindingEnterTip = "<Shift clic gauche> configurer les raccourcis"
-L.BindingExitTip = "<Shift clic gauche> arr\195\170ter la config. des raccourcis"
+L.BindingEnterTip = "<MAJ clic gauche> configurer les raccourcis"
+L.BindingExitTip = "<MAJ clic gauche> arr\195\170ter la config. des raccourcis"
 L.ShowOptionsTip = "<Clic droit> afficher le menu d'options"
 --helper dialog stuff
 L.ConfigMode = "Mode Configuration"
 L.ConfigModeExit = "Sortir du Mode Config."
-L.ConfigModeHelp = "<Clic-drag> d\195\169place la barre.  <Clic droit> configurer.  <Clic milieu> ou <Shift-Clic droit> visible/invisible"
+L.ConfigModeHelp = [[<Clic-drag> déplace la barre.
+<Clic droit> configurer.
+<Clic milieu> ou <MAJ-Clic droit> visible/invisible.]]
 --bar tooltips
 L.TipRollBar = "Affiche le cadre des objets tir\195\169s au sort, lorsqu'on est en groupe."
 L.TipVehicleBar = [[
@@ -68,5 +70,11 @@ L.Width = "Largeur"
 L.Height = "Hauteur"
 L.AlwaysShowText = "Toujours afficher le texte"
 L.AlwaysShowXP = "Toujours afficher l'XP"
+-- objectives tracker
+L.QuestTracker = "Suivi des objectifs"
+L.QuestLClick1 = "Clic gauche pour agrandir le suivi des objectifs."
+L.QuestLClick2 = "Clic gauche pour r\195\169duire le suivi des objectifs."
+L.QuestRClick = "Clic droit pour afficher/cacher le journal de qu\195\170tes."
+L.QuestSClick = "MAJ-clic pour afficher/cacher la fenêtre des hauts faits."
 --cast bar
 L.ShowTime = "Montrer le temps"

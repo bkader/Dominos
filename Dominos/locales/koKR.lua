@@ -47,7 +47,9 @@ L.ShowOptionsTip = "<우-클릭> 옵션 메뉴 표시"
 --helper dialog stuff
 L.ConfigMode = "설정 모드"
 L.ConfigModeExit = "설정 모드 종료"
-L.ConfigModeHelp = "<끌기> 바 이동.  <우-클릭> 설정.  <가운데-클릭> 또는 <Shift-우-클릭> 표시 전환"
+L.ConfigModeHelp = [[<끌기> 바 이동.
+<우-클릭> 설정.
+<가운데-클릭> 또는 <Shift-우-클릭> 표시 전환]]
 --xp bar
 L.Texture = "무늬"
 L.Width = "너비"

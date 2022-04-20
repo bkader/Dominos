@@ -1,11 +1,16 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Dominos-Config", "enUS", true)
+if not L then return end
 
 L.Scale = "Scale"
 L.Opacity = "Opacity"
 L.FadedOpacity = "Faded Opacity"
 L.Visibility = "Visibility"
 L.Spacing = "Spacing"
+L.SpacingHor = "Horizontal Spacing"
+L.SpacingVer = "Vertical Spacing"
 L.Padding = "Padding"
+L.PaddingHor = "Horizontal Padding"
+L.PaddingVer = "Vertical Padding"
 L.Layout = "Layout"
 L.Columns = "Columns"
 L.Size = "Size"

@@ -46,7 +46,9 @@ L.ShowOptionsTip = "<右键> 显示设置菜单"
 --helper dialog stuff
 L.ConfigMode = "设置模式"
 L.ConfigModeExit = "退出设置模式"
-L.ConfigModeHelp = "<拖动> 移动技能条.  <右键> 进入设置.  <中键> 或 <Shift+右键> 设置是否显示"
+L.ConfigModeHelp = [[<拖动> 移动技能条.
+<右键> 进入设置.
+<中键> 或 <Shift+右键> 设置是否显示]]
 --bar tooltips
 L.TipRollBar = "在团队中时，显示物品掷点面板"
 L.TipVehicleBar = [[

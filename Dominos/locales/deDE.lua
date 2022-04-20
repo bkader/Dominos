@@ -46,7 +46,9 @@ L.ShowOptionsTip = "<Rechtsklick> um das Einstellungsmen\195\188 anzuzeigen"
 --helper dialog stuff
 L.ConfigMode = "Konfigurations-Modus"
 L.ConfigModeExit = "Konfig-Modus verlassen"
-L.ConfigModeHelp = "<Ziehe> irgendeine Leiste um sie zu verschieben.  <Rechtsklick> zum Konfigurieren.  <Mausrad-Klick> oder <Umschalt-Rechtsklick> zum Anzeigen/Verstecken."
+L.ConfigModeHelp = [[<Ziehe> irgendeine Leiste um sie zu verschieben.
+<Rechtsklick> zum Konfigurieren.
+<Mausrad-Klick> oder <Umschalt-Rechtsklick> zum Anzeigen/Verstecken.]]
 --bar tooltips
 L.TipRollBar = "Zeigt innerhalb einer Gruppe die Fenster zum W\195\188rfeln auf Gegenst\195\164nde."
 L.TipVehicleBar = [[

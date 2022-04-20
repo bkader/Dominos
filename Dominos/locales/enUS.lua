@@ -1,4 +1,5 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Dominos", "enUS", true)
+if not L then return end
 --system messages
 L.NewPlayer = "Created new profile for %s"
 L.Updated = "Updated to v%s"
@@ -45,7 +46,9 @@ L.ShowOptionsTip = "<Right Click> to show the options menu"
 --helper dialog stuff
 L.ConfigMode = "Configuration Mode"
 L.ConfigModeExit = "Exit Config Mode"
-L.ConfigModeHelp = "<Drag> any bar to move it.  <Right Click> to configure.  <Middle Click> or <Shift-Right Click> to toggle visibility"
+L.ConfigModeHelp = [[<Drag> any bar to move it.
+<Right Click> to configure.
+<Middle Click> or <Shift-Right Click> to toggle visibility.]]
 --bar tooltips
 L.TipRollBar = "Displays frames for rolling on items, when in a group."
 L.TipVehicleBar = [[
@@ -58,7 +61,7 @@ L.Height = "Height"
 L.AlwaysShowText = "Always Show Text"
 L.AlwaysShowXP = "Always Show XP"
 -- objectives tracker
-L["Objectives Tracker"] = true
+L.QuestTracker = "Objectives Tracker"
 L.QuestLClick1 = "Left-click to expand the objectives tracker."
 L.QuestLClick2 = "Left-click to minimize the objectives tracker."
 L.QuestRClick = "Right-click to toggle the quest log."
