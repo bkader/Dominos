@@ -237,6 +237,7 @@ function Dominos:Load()
 
 	-- minimap button
 	self:UpdateMinimapButton()
+	self:LoadBFa()
 end
 
 -- unload is called when we're switching profiles
@@ -529,6 +530,8 @@ function Dominos:OnCmd(args)
 		self:ListProfiles()
 	elseif cmd == "version" then
 		self:PrintVersion()
+	elseif cmd == "bfa" then
+		self:SetBfA(select(2, string.split(" ", args)))
 	elseif cmd == "help" or cmd == "?" then
 		--options stuff
 		self:PrintHelp()
@@ -770,6 +773,75 @@ end
 function Dominos:SetShowGrid(enable)
 	self.db.profile.showgrid = enable or false
 	self.ActionBar:ForAll("UpdateGrid")
+end
+
+do
+	local ABART = nil
+	local MMART = nil
+	local texpath = [[Interface\Addons\Dominos\textures\BfA\%s.blp]]
+
+	function Dominos:SetBfA(cmd, arg)
+		if cmd == nil then -- empty to disable
+			if self.db.profile.bfaTexture then
+				self.db.profile.bfaTexture = nil
+				self.db.profile.bfaScale = nil
+				if ABART then ABART:Hide() end
+				if MMART then MMART:Hide() end
+			end
+			return
+		end
+
+		if cmd == "short" or cmd == "small" then
+			self.db.profile.bfaTexture = format("S%sG", arg == "noart" and "N" or "W")
+		elseif cmd == "large" or cmd == "long" then
+			self.db.profile.bfaTexture = format("L%sG", arg == "noart" and "N" or "W")
+		end
+
+		self.db.profile.bfaScale = self.db.profile.bfaScale or 1
+		if cmd == "scale" then
+			self.db.profile.bfaScale = tonumber(arg) or self.db.profile.bfaScale or 1
+		end
+
+		self:LoadBFa()
+	end
+
+	function Dominos:LoadBFa()
+		if self.db.profile.bfaTexture and self.db.profile.bfaScale then
+			self.hasBFA = true
+			-- micro menu art
+			if not MMART then
+				MMART = CreateFrame("Frame", "DominosMicroMenuArt", UIParent)
+				MMART:SetFrameStrata("BACKGROUND")
+				MMART:SetPoint("BOTTOMRIGHT", 0, 0)
+				MMART:SetSize(512, 128)
+				MMART.Texture = MMART:CreateTexture("$parentTexture", "BACKGROUND")
+				MMART.Texture:SetTexture(format(texpath, "MMA"))
+				MMART.Texture:SetAllPoints(MMART)
+				MMART:SetScale(self.db.profile.bfaScale)
+			else
+				MMART:SetScale(self.db.profile.bfaScale)
+				MMART:Show()
+			end
+
+			-- action bar art
+			if not ABART then
+				ABART = CreateFrame("Frame", "DominosActionBarArt", UIParent)
+				ABART:SetFrameStrata("BACKGROUND")
+				ABART:SetPoint("BOTTOM", 0, 0)
+				ABART:SetSize(1024, 128)
+				ABART.Texture = ABART:CreateTexture("$parentTexture", "BACKGROUND")
+				ABART.Texture:SetTexture(format(texpath, self.db.profile.bfaTexture))
+				ABART.Texture:SetAllPoints(ABART)
+				ABART:SetScale(self.db.profile.bfaScale)
+			else
+				ABART:SetScale(self.db.profile.bfaScale)
+				ABART.Texture:SetTexture(format(texpath, self.db.profile.bfaTexture))
+				ABART:Show()
+			end
+		elseif self.hasBFA then
+			self.hasBFA = nil
+		end
+	end
 end
 
 function Dominos:ShowGrid()
