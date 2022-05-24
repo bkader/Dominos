@@ -76,6 +76,17 @@ function DebuffsFrame:CreateDebuffs()
 	end
 end
 
+local lastUpdated = 0
+local function OnUpdate(self, elapsed)
+	lastUpdated = lastUpdated + elapsed
+	if lastUpdated > 0.01 then
+		lastUpdated = 0
+		for i = 1, self:NumButtons() do
+			self:UpdateDebuff(i, elapsed)
+		end
+	end
+end
+
 function DebuffsFrame:CreateDebuff(id)
 	local frameName = "DominosDebuffsDebuff" .. id
 	local debuff = CreateFrame("Button", frameName, UIParent, "BuffButtonTemplate, TargetDebuffFrameTemplate")
@@ -83,11 +94,7 @@ function DebuffsFrame:CreateDebuff(id)
 	debuff.icon = _G[frameName .. "Icon"]
 	debuff.icon:SetTexCoord(.1, .9, .1, .9)
 	debuff.cooldown = _G[frameName .. "Cooldown"]
-	self:SetScript("OnUpdate", function(self, elapsed)
-		for i = 1, self:NumButtons() do
-			self:UpdateDebuff(i)
-		end
-	end)
+	self:SetScript("OnUpdate", OnUpdate)
 	return debuff
 end
 

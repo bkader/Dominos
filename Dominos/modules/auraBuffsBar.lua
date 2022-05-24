@@ -70,6 +70,17 @@ function BuffsFrame:CreateBuffs()
     end
 end
 
+local lastUpdated = 0
+local function OnUpdate(self, elapsed)
+	lastUpdated = lastUpdated + elapsed
+	if lastUpdated > 0.01 then
+		lastUpdated = 0
+		for i = 1, self:NumButtons() do
+			self:UpdateBuff(i, elapsed)
+		end
+	end
+end
+
 function BuffsFrame:CreateBuff(id)
     local frameName = "DominosBuff" .. id
     local buff = CreateFrame("Button", frameName, UIParent, "BuffButtonTemplate, TargetBuffFrameTemplate")
@@ -78,9 +89,7 @@ function BuffsFrame:CreateBuff(id)
     buff.icon:SetTexCoord(.1, .9, .1, .9)
     buff:SetScript("OnClick", function() CancelUnitBuff("player", id, "HELPFUL") end)
     buff.cooldown = _G[frameName .. "Cooldown"]
-    self:SetScript("OnUpdate", function(self, elapsed)
-        for i = 1, self:NumButtons() do self:UpdateBuff(i) end
-    end)
+    self:SetScript("OnUpdate", OnUpdate)
     return buff
 end
 
